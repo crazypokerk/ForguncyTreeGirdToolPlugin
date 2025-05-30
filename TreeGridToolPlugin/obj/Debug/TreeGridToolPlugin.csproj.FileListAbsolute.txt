@@ -1,0 +1,17 @@
+F:\TreeGridToolPlugin\TreeGridToolPlugin\bin\TreeGridToolPlugin.deps.json
+F:\TreeGridToolPlugin\TreeGridToolPlugin\bin\TreeGridToolPlugin.dll
+F:\TreeGridToolPlugin\TreeGridToolPlugin\bin\TreeGridToolPlugin.pdb
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.csproj.AssemblyReference.cache
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\Designer\DrawingControl\TreeGridToolPluginCellTypeDrawingControl.g.cs
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin_MarkupCompile.cache
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin_MarkupCompile.lref
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\Designer\DrawingControl\TreeGridToolPluginCellTypeDrawingControl.baml
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.g.resources
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.GeneratedMSBuildEditorConfig.editorconfig
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.AssemblyInfoInputs.cache
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.AssemblyInfo.cs
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.csproj.CoreCompileInputs.cache
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.dll
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\refint\TreeGridToolPlugin.dll
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.pdb
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\ref\TreeGridToolPlugin.dll

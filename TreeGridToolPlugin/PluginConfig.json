@@ -1,0 +1,23 @@
+{
+  "assembly": [
+    "TreeGridToolPlugin.dll"
+  ],
+  "css": [
+  ],
+  "javascript": [
+    "Resources/js/lodash.min.js",
+    "Resources/js/wunderbaum.umd.min.js",
+    "Resources/TreeGridToolPluginCellType.js",
+    "Resources/TreeGridToolPluginCommand.js"
+  ],
+  "serverApiAssembly": [],
+  "image": "Resources/PluginLogo.png",
+  "description": "这是一个活字格插件",
+  "name": "树形工具插件",
+  "pluginType": "cellType,command",
+  "guid": "aeb68ae2-ed89-4952-9798-9d7fbd757fa5",
+  "version": "1.0.0.0",
+  "dependenceVersion": "11.0.2.0",
+  "bundleJavaScript": true,
+  "bundleCSS": true
+}

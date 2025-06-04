@@ -3,6 +3,7 @@
     "TreeGridToolPlugin.dll"
   ],
   "css": [
+    "Resources/css/wunderbaum.css"
   ],
   "javascript": [
     "Resources/js/lodash.min.js",

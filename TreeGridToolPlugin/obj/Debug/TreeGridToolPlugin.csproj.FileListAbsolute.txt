@@ -11,6 +11,7 @@ F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.GeneratedM
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.AssemblyInfoInputs.cache
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.AssemblyInfo.cs
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.csproj.CoreCompileInputs.cache
+F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.sourcelink.json
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.dll
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\refint\TreeGridToolPlugin.dll
 F:\TreeGridToolPlugin\TreeGridToolPlugin\obj\Debug\TreeGridToolPlugin.pdb

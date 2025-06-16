@@ -3,6 +3,7 @@
     "TreeGridToolPlugin.dll"
   ],
   "css": [
+    "Resources/css/bootstrap-icons.min.css",
     "Resources/css/wunderbaum.css"
   ],
   "javascript": [

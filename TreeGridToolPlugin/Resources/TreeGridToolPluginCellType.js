@@ -2,8 +2,9 @@
 /// <reference path="../Declarations/forguncy.Plugin.d.ts" />
 
 class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
-    createContent() {
+    treeData;
 
+    createContent() {
         // 构建 Jquery Dom 并返回
         const $main = $("<main>").addClass("view");
 
@@ -14,13 +15,22 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         const $div = $("<div>")
             .attr("id", "demo-tree")
             .addClass("wb-skeleton wb-initializing wb-no-select");
-
         // 组装结构
         $main.append($output).append($div);
+
         return $main;
     }
 
-    onPageLoaded() {
+    #getBindingDataSourceValueAsync(datasource) {
+        return new Promise((resolve, reject) => {
+            this.getBindingDataSourceValue(datasource, null, data => {
+                resolve(data);
+            });
+        });
+    }
+    async onPageLoaded() {
+        const datasource = this.CellElement.CellType.DataSource;
+        let treeColumns = [];
         let json = [
             {
                 "title": "Books",
@@ -248,110 +258,293 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 ]
             },
         ]
+        
+        try {
+            const data = await this.#getBindingDataSourceValueAsync(datasource);
+            let datasourceColumnsNameArray = datasource.CustomColumns;
+            datasourceColumnsNameArray.push("ID");
+            treeColumns = this.#generateColumns(data);
 
-        let treeGrid = new mar10.Wunderbaum({
-            id: "demo",
-            element: document.getElementById("demo-tree"),
-            source: json,
-            debugLevel: 5,
-            connectTopBreadcrumb: "output#parentPath",
-            checkbox: true,
-            minExpandLevel: 1,
-            navigationModeOption: "startRow",
-            types: {},
-            columns: [
-                { id: "*", title: "Product", width: "250px" },
-                { id: "author", title: "Author", width: "200px" },
-                { id: "year", title: "Year", width: "50px", classes: "wb-helper-end" },
-                { id: "qty", title: "Qty", width: "50px", classes: "wb-helper-end" },
-                {
-                    id: "price",
-                    title: "Price ($)",
-                    width: "80px",
-                    classes: "wb-helper-end",  // 
+            new mar10.Wunderbaum({
+                id: "demo",
+                element: document.getElementById("demo-tree"),
+                debugLevel: 5,
+                connectTopBreadcrumb: "output#parentPath",
+                checkbox: true,
+                // fixedCol: true,
+                // navigationModeOption: "row",
+                navigationModeOption: "startRow",
+                // navigationModeOption: "cell",
+
+                // The JSON only contains a list of nested node dicts, but no types or
+                // column definitions:
+                source:
+                    "https://cdn.jsdelivr.net/gh/mar10/assets@master/wunderbaum/tree_department_M_p.json",
+                types: {
+                    department: { icon: "bi bi-diagram-3", colspan: true },
+                    role: { icon: "bi bi-microsoft-teams", colspan: true },
+                    person: { icon: "bi bi-person" },
                 },
-                { id: "details", title: "Details", width: "*" },
-            ],
-            columnsResizable: true,
-            columnsSortable: true,
-            dnd: {
-                dragStart: (e) => {
-                    if (e.node.type === "folder") {
-                        return false;
+                // The `html` properties are shown as comments.
+                // If enabled, it would be used as markup, so `if (e.isNew) {...}` could be
+                // omitted in the `render` callback:
+                columns: [
+                    {
+                        title: "Title",
+                        id: "*",
+                        width: "250px",
+                    },
+                    {
+                        title: "Age",
+                        id: "age",
+                        width: "50px",
+                        classes: "wb-helper-end",
+                        //"html": "<input type=number min=0 tabindex='-1'>",
+                    },
+                    {
+                        title: "Date",
+                        id: "date",
+                        width: "100px",
+                        classes: "wb-helper-end",
+                        // "html": '<input type=date tabindex="-1">',
+                    },
+                    {
+                        title: "Status",
+                        id: "state",
+                        width: "70px",
+                        classes: "wb-helper-center",
+                        // "html": `<select tabindex="-1">
+                        //     <option value="h">Happy</option>
+                        //     <option value="s">Sad</option>
+                        //     </select>`
+                    },
+                    {
+                        title: "Avail.",
+                        id: "avail",
+                        width: "80px",
+                        classes: "wb-helper-center",
+                        // "html": '<input type=checkbox tabindex="-1">',
+                    },
+                    {
+                        title: "Remarks",
+                        id: "remarks",
+                        width: "*",
+                        // "html": "<input type=text tabindex='-1'>",
+
+                        menu: true,
+                    },
+                ],
+                columnsResizable: true,
+                columnsSortable: true,
+
+                edit: {
+                    trigger: ["clickActive", "F2"], // "macEnter"],
+                    select: true,
+                    beforeEdit: function (e) {
+                        // console.log(e.type, e);
+                        // return e.node.type === "person";
+                    },
+                    edit: function (e) {
+                        console.log(e.type, e);
+                    },
+                    apply: function (e) {
+                        console.log(e.type, e);
+                        // Simulate async storage that also validates:
+                        return e.util.setTimeoutPromise(() => {
+                            e.inputElem.setCustomValidity("");
+                            if (e.newValue.match(/.*\d.*/)) {
+                                e.inputElem.setCustomValidity("No numbers please.");
+                                return false;
+                            }
+                        }, 1000);
+                    },
+                },
+                filter: {
+                    mode: "hide",
+                    autoExpand: true,
+                    // connect: {
+                    //     inputElem: "#filter-query",
+                    //     // modeButton: "#filter-hide",  // using a custom handler
+                    //     nextButton: "#filter-next",
+                    //     prevButton: "#filter-prev",
+                    //     matchInfoElem: "#filter-match-info",
+                    // },
+                },
+                init: (e) => { },
+                // load: function (e) {
+                // },
+                buttonClick: function (e) {
+                    console.log(e.type, e);
+                    if (e.command === "sort") {
+                        e.tree.sortByProperty({ colId: e.info.colId, updateColInfo: true });
                     }
-                    e.event.dataTransfer.effectAllowed = "all";
-                    return true;
                 },
-                dragEnter: (e) => {
-                    if (e.node.type === "folder") {
-                        e.event.dataTransfer.dropEffect = "copy";
-                        return "over";
-                    }
-                    return ["before", "after"];
+                change: function (e) {
+                    const util = e.util;
+                    const node = e.node;
+                    const info = e.info;
+                    const colId = info.colId;
+
+                    this.logDebug(`change(${colId})`, util.getValueFromElem(e.inputElem, true));
+                    // For demo purposes, simulate a backend delay:
+                    return util.setTimeoutPromise(() => {
+                        // Assumption: we named column.id === node.data.NAME
+
+                        // We can hand-code and customize it like so:
+                        // switch (colId) {
+                        //   case "author":
+                        //   case "details":
+                        //   case "price":
+                        //   case "qty":
+                        //   case "sale": // checkbox control
+                        //   case "avail": // checkbox control
+                        //   case "state": // dropdown
+                        //   case "year":
+                        //     // e.node.data[colId] = e.inputValue;
+                        //     // ... but this helper should work in most cases:
+                        //     e.node.data[colId] = util.getValueFromElem(e.inputElem, true);
+                        //     break;
+                        // }
+
+                        // ... but this helper should work in most cases:
+                        node.data[colId] = util.getValueFromElem(e.inputElem, true);
+                    }, 500);
                 },
-                drop: (e) => {
-                    console.log("Drop " + e.sourceNode + " => " + e.region + " " + e.node);
-                    e.sourceNode.moveTo(e.node, e.suggestedDropMode);
-                },
-            },
-            edit: {
-                trigger: ["clickActive", "F2", "macEnter"],
-                select: true,
-                beforeEdit: function (e) {
-                    console.log(e.type, e);
-                    // return false;
-                },
-                edit: function (e) {
-                    console.log(e.type, e);
-                },
-                apply: function (e) {
-                    console.log(e.type, e);
-                    // Simulate async storage that also validates:
-                    return e.util.setTimeoutPromise(() => {
-                        e.inputElem.setCustomValidity("");
-                        if (e.newValue.match(/.*\d.*/)) {
-                            e.inputElem.setCustomValidity("No numbers please.");
-                            return false;
+                render: function (e) {
+                    // console.log(e.type, e.isNew, e);
+                    const node = e.node;
+                    const util = e.util;
+
+                    // Render embedded input controls for all data columns
+                    for (const col of Object.values(e.renderColInfosById)) {
+                        // Assumption: we named column.id === node.data.NAME
+                        const val = node.data[col.id];
+
+                        switch (col.id) {
+                            case "author":
+                                if (e.isNew) {
+                                    col.elem.innerHTML = '<input type="text" tabindex="-1">';
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            case "remarks": // text control
+                                if (e.isNew) {
+                                    col.elem.innerHTML = '<input type="text" tabindex="-1">';
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            // case "details": // text control
+                            //   if (e.isNew) {
+                            //     col.elem.innerHTML = '<input type="text" tabindex="-1">';
+                            //   }
+                            //   util.setValueToElem(col.elem, node.data.details);
+                            //   break;
+                            // case "price":
+                            //   if (e.isNew) {
+                            //     col.elem.innerHTML = '<input type="number" min="0.00" step="0.01" tabindex="-1">';
+                            //   }
+                            //   util.setValueToElem(col.elem, node.data.price.toFixed(2));
+                            //   break;
+                            case "age":
+                                if (e.isNew) {
+                                    col.elem.innerHTML = '<input type="number" min="0" tabindex="-1">';
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            case "state":
+                                if (e.isNew) {
+                                    col.elem.innerHTML = `<select tabindex="-1">
+                <option value="h">Happy</option>
+                <option value="s">Sad</option>
+                </select>`;
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            case "avail":
+                                if (e.isNew) {
+                                    col.elem.innerHTML = '<input type="checkbox" tabindex="-1">';
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            // case "qty":
+                            //   if (e.isNew) {
+                            //     col.elem.innerHTML = '<input type="number" min="0" tabindex="-1">';
+                            //   }
+                            //   util.setValueToElem(col.elem, val);
+                            //   break;
+                            // case "sale": // checkbox control
+                            //   if (e.isNew) {
+                            //     col.elem.innerHTML = '<input type="checkbox" tabindex="-1">';
+                            //   }
+                            //   // Cast value to bool, since we don't want tri-state behavior
+                            //   util.setValueToElem(col.elem, !!val);
+                            //   break;
+                            case "date":
+                                if (e.isNew) {
+                                    col.elem.innerHTML = '<input type="date" tabindex="-1">';
+                                }
+                                util.setValueToElem(col.elem, val);
+                                break;
+                            // case "year":
+                            //   if (e.isNew) {
+                            //     col.elem.innerHTML = '<input type="number" max="9999" tabindex="-1">';
+                            //   }
+                            //   util.setValueToElem(col.elem, node.data.year);
+                            //   break;
+                            default:
+                                // Assumption: we named column.id === node.data.NAME
+                                col.elem.textContent = node.data[col.id];
+                                break;
                         }
-                    }, 1000);
-                },
-            },
-
-            init: (e) => {
-                console.log(e.type, e);
-                e.tree.findFirst("More...").setExpanded();
-                e.tree
-                    .findFirst((n) => {
-                        return n.data.qty === 21;
-                    })
-                    .setActive();
-                // e.tree.setFocus();
-            },
-            load: (e) => {
-                console.log(e.type, e);
-                // e.tree.addChildren({ title: "custom1", classes: "wb-error" });
-            },
-            buttonClick: function (e) {
-                console.log(e.type, e);
-                if (e.command === "sort") {
-                    e.tree.sortByProperty({ colId: e.info.colId, updateColInfo: true });
-                }
-            },
-            render: function (e) {
-                // console.log(e.type, e.isNew, e);
-                const node = e.node;
-                // const util = e.util;
-
-                for (const col of Object.values(e.renderColInfosById)) {
-                    switch (col.id) {
-                        default:
-                            // Assumption: we named column.id === node.data.NAME
-                            col.elem.textContent = node.data[col.id];
-                            break;
                     }
-                }
-            },
+                },
+            });
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+
+    #generateColumns(data) {
+        if (!data.length) return [];
+
+        // 1. 获取所有字段名，并排除 ID 和 PID
+        const keys = Object.keys(data[0]);
+        const filteredKeys = keys.filter(key => !['ID', 'PID'].includes(key));
+
+        // 2. 生成列配置数组
+        return filteredKeys.map(key => {
+            const title = key.charAt(0).toUpperCase() + key.slice(1); // 首字母大写
+            const id = key.toLowerCase(); // id 为字段名小写
+            if(key === "product"){
+                return {id: "*", title: "Product"}
+            }
+
+            // 3. 根据字段名设置默认配置（可扩展）
+            const column = {id, title};
+
+            return column;
         });
+    }
+
+    #buildTree(data, idKey = 'ID', parentKey = 'PID', rootValue = null) {
+        const map = _.keyBy(data, idKey); // 建立 ID 到节点的映射
+        const tree = [];
+
+        _.forEach(data, (item) => {
+            const parentId = item[parentKey];
+            const parent = map[parentId];
+
+            if (parentId === rootValue || !parent) {
+                // 根节点
+                tree.push(item);
+            } else {
+                // 子节点，加入父节点的 children 数组
+                parent.children = parent.children || [];
+                parent.children.push(item);
+            }
+        });
+
+        return tree;
     }
 }
 

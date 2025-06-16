@@ -15,7 +15,7 @@ namespace TreeGridToolPlugin
 
         public override string ToString()
         {
-            return "树形工具插件命令";
+            return "树形工具命令";
         }
     }
 }

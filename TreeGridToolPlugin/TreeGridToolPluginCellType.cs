@@ -10,14 +10,17 @@ namespace TreeGridToolPlugin
     [Designer(typeof(TreeGirdPluginCellTypeDesigner))]
     public class TreeGridToolPluginCellType : CellType
     {
-        public string MyProperty { get; set; } = "TreeGridToolPlugin";
+        [BindingDataSourceProperty(AllowAddCustomColumns = true, Columns = "ID|PID:父ID|Title:标题", IsIdPidStructure = true,
+            TreeIdColumnName = "ID", TreePidColumnName = "PID")]
+        [DisplayName("绑定数据源")]
+        public object DataSource { get; set; }
 
         public override string ToString()
         {
-            return "树形工具插件单元格";
+            return "树形工具单元格";
         }
     }
-    
+
     public class TreeGirdPluginCellTypeDesigner : CellTypeDesigner<TreeGridToolPluginCellType>
     {
         public override FrameworkElement GetDrawingControl(ICellInfo cellInfo, IDrawingHelper drawingHelper)

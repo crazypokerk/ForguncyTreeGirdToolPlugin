@@ -38,6 +38,28 @@ namespace TreeGridToolPlugin
         
         [DisplayName("列样式")]
         public ColumnClass ColumnStyle { get; set; }
+        
+        [DisplayName("单元格类型")]
+        public CellTypeEnum CellType { get; set; }
+
+        [DisplayName("是否可编辑")]
+        public bool Editable { get; set; }
+    }
+    
+    public enum CellTypeEnum
+    {
+        [Description("文本")]
+        Text = 0,
+        [Description("数字")]
+        Number = 1,
+        [Description("日期")]
+        Date = 2,
+        [Description("复选框")]
+        Checkbox = 3,
+        [Description("下拉框")]
+        Select = 4,
+        [Description("链接")]
+        Link = 5
     }
 
     public enum ColumnClass

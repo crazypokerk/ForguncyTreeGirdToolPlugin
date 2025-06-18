@@ -4,6 +4,16 @@
 class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     treeData;
     columnsConfig;
+    cellTypeMap;
+    
+    cellType = {
+        0: "text",
+        1: "number",
+        2: "date",
+        3: "checkbox",
+        4: "select",
+        5: "link",
+    }
     
     columnsStyleType = {
         0: "wb-helper-center",
@@ -15,21 +25,26 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         6: "wb-helper-link"
     };
     createContent() {
-        // 构建 Jquery Dom 并返回
+        const $outer = $("<div style='width:100%;height:60%'>")
+           .attr("id", "outer")
+           .addClass("outer");
         const $main = $("<main>").addClass("view");
         const $output = $("<output>")
             .attr("id", "parentPath")
             .addClass("hide-on-welcome hidden");
         const $div = $("<div>")
             .attr("id", "demo-tree")
-            .addClass("wb-skeleton wb-initializing wb-no-select");
-        $main.append($output).append($div);
+            .addClass("wb-skeleton wb-no-select wunderbaum wb-grid wb-ext-keynav wb-ext-edit wb-ext-filter wb-ext-dnd wb-ext-grid wb-cell-mode");
+        $outer.append($main).append($output).append($div);
         
         const columnsProperties = this.CellElement.CellType.ColumnsProperties;
         //this.treeData = this.#buildTree(datasource);
-        this.columnsConfig =  this.#generateColumns(columnsProperties);
-
-        return $main;
+        let columnsConfigObj =  this.#generateColumns(columnsProperties);
+        this.columnsConfig = columnsConfigObj.cols;
+        this.cellTypeMap = columnsConfigObj.cellTypeMap;
+        console.warn(this.cellTypeMap);
+        
+        return $outer;
     }
     
     onPageLoaded() {
@@ -130,60 +145,14 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                         node.data[colId] = util.getValueFromElem(e.inputElem, true);
                     }, 500);
                 },
-                render: function (e) {
-                    // console.log(e.type, e.isNew, e);
+                render: (e)=>  {
                     const node = e.node;
                     const util = e.util;
-
-                    // Render embedded input controls for all data columns
                     for (const col of Object.values(e.renderColInfosById)) {
-                        // Assumption: we named column.id === node.data.NAME
                         const val = node.data[col.id];
-
-                        switch (col.id) {
-                            case "author":
-                                if (e.isNew) {
-                                    col.elem.innerHTML = '<input type="text" tabindex="-1">';
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            case "remarks": // text control
-                                if (e.isNew) {
-                                    col.elem.innerHTML = '<input type="text" tabindex="-1">';
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            case "age":
-                                if (e.isNew) {
-                                    col.elem.innerHTML = '<input type="number" min="0" tabindex="-1">';
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            case "state":
-                                if (e.isNew) {
-                                    col.elem.innerHTML = `<select tabindex="-1">
-                <option value="h">Happy</option>
-                <option value="s">Sad</option>
-                </select>`;
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            case "avail":
-                                if (e.isNew) {
-                                    col.elem.innerHTML = '<input type="checkbox" tabindex="-1">';
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            case "date":
-                                if (e.isNew) {
-                                    col.elem.innerHTML = '<input type="date" tabindex="-1">';
-                                }
-                                util.setValueToElem(col.elem, val);
-                                break;
-                            default:
-                                // Assumption: we named column.id === node.data.NAME
-                                col.elem.textContent = node.data[col.id];
-                                break;
+                        if(e.isNew) {
+                            col.elem.innerHTML = this.#setColumnCellType(this.cellTypeMap.get(col.id));
+                            util.setValueToElem(col.elem, val);
                         }
                     }
                 },
@@ -196,13 +165,11 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     #buildTree(data) {
         const map = new Map();
         const result = [];
-
-        // 第一步：将所有节点存入 Map，初始化 children
+        
         data.forEach(node => {
             map.set(node.ID, { ...node, children: [] });
         });
 
-        // 第二步：构建父子关系
         data.forEach(node => {
             const current = map.get(node.ID);
             if (current.PID && map.has(current.PID)) {
@@ -219,6 +186,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     #generateColumns(customColumns) {
         if (!customColumns.length) return [];
         
+        const cellTypeMap = new Map();
         const cols = [];
         customColumns.forEach((item)=> {
             cols.push({
@@ -227,8 +195,41 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 width: item.Width == null ? "*" : `${item.Width}px`,
                 classes: this.columnsStyleType[item.ColumnStyle]
             });
+            cellTypeMap.set(item.Id, item.CellType);
         })
-        return cols;
+        return {cols, cellTypeMap};
+    }
+    
+    #setColumnCellType(type) {
+        let innerHTML = '';
+        switch (type) {
+            case 0:
+                innerHTML = '<input type="text" tabindex="-1">';
+                break;
+            case 1:
+                innerHTML = '<input type="number" min="0" tabindex="-1">';
+                break;
+            case 2:
+                innerHTML = '<input type="date" tabindex="-1">';
+                break;
+            case 3:
+                innerHTML = '<input type="checkbox" tabindex="-1">';
+                break;
+            case 4:
+                innerHTML = `<select tabindex="-1">
+                                <option value="h">Happy</option>
+                                <option value="s">Sad</option>
+                             </select>`;
+                break;
+            case 5:
+                innerHTML = '<input type="url" tabindex="-1">';
+                break;
+            default:
+                innerHTML = '<input type="text" tabindex="-1">';
+                break;
+        }
+        
+        return innerHTML;
     }
 
     SetJsonData(json) {

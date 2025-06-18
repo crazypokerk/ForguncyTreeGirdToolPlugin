@@ -49,6 +49,9 @@
     <None Remove="Resources\PluginLogo.png" />
     <Resource Include="Resources\PluginLogo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Utils\" />
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="&quot;..\PackageTools\ForguncyPluginPackageTool.exe&quot; &quot;$(ProjectDir).&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; $(ConfigurationName)" />
   </Target>

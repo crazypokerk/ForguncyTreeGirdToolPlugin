@@ -11,10 +11,15 @@ namespace TreeGridToolPlugin
     [Designer(typeof(TreeGirdPluginCellTypeDesigner))]
     public class TreeGridToolPluginCellType : CellType
     {
-        [DisplayName("设置JSON数据")]
-        [RunTimeMethod]
-        [RunTimeMethodDesigner(typeof(SetJsonDataRuntimeMethod))]
-        public void SetJsonData([ItemDisplayName("JSON字符串")]string json){}
+        // [DisplayName("设置JSON数据")]
+        // [RunTimeMethod]
+        // [RunTimeMethodDesigner(typeof(SetJsonDataRuntimeMethod))]
+        // public void SetJsonData([ItemDisplayName("JSON字符串")]string json){}
+        
+        [DisplayName("JSON数据")]
+        [SupportModifyByRuntimeProperty(UseFormulaEditor = true)]
+        [FormulaProperty]
+        public object JsonDataSource { get; set; }
         
         [DisplayName("列名配置")]
         [ObjectListProperty(ItemType = typeof(ColumnObject))]
@@ -43,6 +48,7 @@ namespace TreeGridToolPlugin
         public CellTypeEnum CellType { get; set; }
 
         [DisplayName("是否可编辑")]
+        [DefaultValue(false)]
         public bool Editable { get; set; }
     }
     
@@ -58,7 +64,7 @@ namespace TreeGridToolPlugin
         Checkbox = 3,
         [Description("下拉框")]
         Select = 4,
-        [Description("链接")]
+        [Description("时间")]
         Link = 5
     }
 
@@ -81,14 +87,7 @@ namespace TreeGridToolPlugin
         // [Description("wb-helper-lazy-expander")]
         // WbHelperLazyExpander
     }
-
-    public class SetJsonDataRuntimeMethod : RunTimeMethodDesigner
-    {
-        public override string Validate(IRuntimeMethodDesignerContext context)
-        {
-            return base.Validate(context);
-        }
-    }
+    
 
     public class TreeGirdPluginCellTypeDesigner : CellTypeDesigner<TreeGridToolPluginCellType>
     {

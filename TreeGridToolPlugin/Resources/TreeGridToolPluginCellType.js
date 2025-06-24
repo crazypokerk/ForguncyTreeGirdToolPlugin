@@ -26,7 +26,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         6: "wb-helper-link"
     };
     createContent() {
-        const $outer = $("<div style='width:100%;height:60%'>")
+        const $outer = $("<div style='width:100%;height:70%'>")
            .attr("id", "outer")
            .addClass("outer");
         const $main = $("<main>").addClass("view");
@@ -39,35 +39,34 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         $outer.append($main).append($output).append($div);
         
         const columnsProperties = this.CellElement.CellType.ColumnsProperties;
-        //this.treeData = this.#buildTree(datasource);
         let columnsConfigObj =  this.#generateColumns(columnsProperties);
         this.columnsConfig = columnsConfigObj.cols;
         this.cellTypeMap = columnsConfigObj.cellTypeMap;
         this.cellIsEditMap = columnsConfigObj.cellIsEdit;
-        console.warn(this.cellTypeMap);
-        console.warn(this.cellIsEditMap);
-        
-        console.info("this.columnsConfig: " + this.columnsConfig);
         
         return $outer;
     }
     
-    onPageLoaded() {
-        console.warn(this.treeData)
-        console.warn("onPageLoaded", this.columnsConfig);
-
-        let jsonData = this.CellElement.CellType.JsonDataSource;
-        let data = this.evaluateFormula(jsonData);
-        if(data === null) {
-            this.treeData = [{
-                "type": null,
-                "title" : "",
-                "children" : null
-            }];
-        } else {
-            this.treeData = data;
-        }
-
+    async onPageLoaded() {
+        await new Promise((resolve, reject) => {
+            try {
+                this.getBindingDataSourceValue(this.CellElement.CellType.DataSource, null, data => {
+                    this.treeData = this.#buildTree(data);
+                    resolve();
+                }, true);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                if(this.treeData == null) {
+                    this.treeData = [{
+                        "type": null,
+                        "title" : "",
+                        "children" : null
+                    }];
+                }
+            }
+        })
+        
         try {
             let tree= new mar10.Wunderbaum({
                 id: "demo",
@@ -132,7 +131,6 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                         let a = tree.findFirst((n) => {
                             return n.data;
                         });
-                        console.warn(a)
                         break;
                     }
                 },
@@ -170,200 +168,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             throw new Error(e);
         }
     }
-    
-    // formatData(data) {
-    //     let source = {
-    //         "_format": "flat",
-    //         "_keyMap": {"title": "t", "key": "k", "type": "y", "children": "c", "expanded": "e"},
-    //         "children": this.columnsConfig
-    //     }
-    //    
-    //     return source;
-    // }
 
-    #buildTree(data) {
-        // const map = new Map();
-        // const result = [];
-        //
-        // data.forEach(node => {
-        //     map.set(node.ID, { ...node, children: [] });
-        // });
-        //
-        // data.forEach(node => {
-        //     const current = map.get(node.ID);
-        //     if (current.PID && map.has(current.PID)) {
-        //         const parent = map.get(current.PID);
-        //         parent.children.push(current);
-        //     } else {
-        //         result.push(current);
-        //     }
-        // });
-        //
-        // return result;
-        
-        const rawData = [
-            {
-                "ID": 1,
-                "PID": null,
-                "Title": "Dept. for Tunes and Technologies",
-                "Age": null,
-                "Date": null,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 2,
-                "PID": null,
-                "Title": "Dept. for Manners and Celebrations",
-                "Age": null,
-                "Date": null,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 3,
-                "PID": 1,
-                "Title": "Tend todaies",
-                "Age": null,
-                "Date": null,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 4,
-                "PID": 1,
-                "Title": "Preside platypuses",
-                "Age": null,
-                "Date": null,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 5,
-                "PID": 1,
-                "Title": "Terminate economicses",
-                "Age": null,
-                "Date": null,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 11,
-                "PID": 3,
-                "Title": "Audrey Roberts",
-                "Age": 44,
-                "Date": 145324800000.0,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": "At vero eos et accusam et justo duo dolores et ea rebum."
-            },
-            {
-                "ID": 12,
-                "PID": 3,
-                "Title": "Dorothy C. Anderson",
-                "Age": 62,
-                "Date": 145324800000.0,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": null
-            },
-            {
-                "ID": 13,
-                "PID": 3,
-                "Title": "Sam S. Baker",
-                "Age": 48,
-                "Date": 1142035200000.0,
-                "Status": "h",
-                "Avail_": 1,
-                "Remarks": null
-            },
-            {
-                "ID": 14,
-                "PID": 3,
-                "Title": "Carl Hamilton",
-                "Age": 28,
-                "Date": null,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": "Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-            },
-            {
-                "ID": 15,
-                "PID": 3,
-                "Title": "Warren Kelly",
-                "Age": 22,
-                "Date": 1255737600000.0,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": null
-            },
-            {
-                "ID": 16,
-                "PID": 3,
-                "Title": "Lou C. North",
-                "Age": 33,
-                "Date": 1673654400000.0,
-                "Status": null,
-                "Avail_": null,
-                "Remarks": "Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis."
-            },
-            {
-                "ID": 17,
-                "PID": 3,
-                "Title": "Alexander S. Mitchell",
-                "Age": 54,
-                "Date": 714268800000.0,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": null
-            },
-            {
-                "ID": 18,
-                "PID": 4,
-                "Title": "Pat B. Chapman",
-                "Age": 91,
-                "Date": 387417600000.0,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": "Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat."
-            },
-            {
-                "ID": 19,
-                "PID": 4,
-                "Title": "Kelly Young",
-                "Age": 28,
-                "Date": null,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": null
-            },
-            {
-                "ID": 20,
-                "PID": 4,
-                "Title": "David Ogden",
-                "Age": 44,
-                "Date": null,
-                "Status": null,
-                "Avail_": 1,
-                "Remarks": null
-            },
-            {
-                "ID": 21,
-                "PID": 4,
-                "Title": "Sonia Z. White",
-                "Age": 43,
-                "Date": null,
-                "Status": "s",
-                "Avail_": 1,
-                "Remarks": null
-            }
-        ]
-        
+    #buildTree(rawData) {
         const idToIndexMap = {};
         rawData.forEach((node, index) => {
            idToIndexMap[node.ID] = index; // 存储每个节点的索引
@@ -373,7 +179,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         
         return {
             "_format": "flat",
-            "children": flatData
+            "_positional": ["title", "key", "type"],
+            "children": flatData,
         }
     }
     
@@ -449,12 +256,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         return innerHTML;
     }
 
-    set_JsonDataSource(json) {
+    SetTreeData(json) {
         this.treeData = json;
         window.tree.load(this.treeData);
     }
     
-    #getTreeDictArray(tree) {
+    GetTreeData(tree) {
         if(tree === null) return;
         tree.toDictArray();
     }

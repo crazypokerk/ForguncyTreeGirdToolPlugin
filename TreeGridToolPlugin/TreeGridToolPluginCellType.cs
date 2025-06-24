@@ -11,19 +11,32 @@ namespace TreeGridToolPlugin
     [Designer(typeof(TreeGirdPluginCellTypeDesigner))]
     public class TreeGridToolPluginCellType : CellType
     {
-        // [DisplayName("设置JSON数据")]
-        // [RunTimeMethod]
-        // [RunTimeMethodDesigner(typeof(SetJsonDataRuntimeMethod))]
-        // public void SetJsonData([ItemDisplayName("JSON字符串")]string json){}
-        
-        [DisplayName("JSON数据")]
-        [SupportModifyByRuntimeProperty(UseFormulaEditor = true)]
-        [FormulaProperty]
-        public object JsonDataSource { get; set; }
+        [BindingDataSourceProperty(
+            AllowAddCustomColumns = true,
+            Columns = "ID|PID",
+            ColumnsDescription = "ID:ID列|PID:父级ID列",
+            IsIdPidStructure = true, 
+            TreeIdColumnName = "ID", 
+            TreePidColumnName = "PID"
+            )]
+        [DisplayName("绑定数据源")]
+        public object DataSource { get; set; }
         
         [DisplayName("列名配置")]
         [ObjectListProperty(ItemType = typeof(ColumnObject))]
         public List<INamedObject> ColumnsProperties { get; set; }
+        
+        [DisplayName("设置数据")]
+        [RunTimeMethod]
+        public void SetTreeData()
+        {
+        }
+        
+        [DisplayName("获取数据")]
+        [RunTimeMethod]
+        public void GetTreeData()
+        {
+        }
         
         public override string ToString()
         {
@@ -88,7 +101,6 @@ namespace TreeGridToolPlugin
         // WbHelperLazyExpander
     }
     
-
     public class TreeGirdPluginCellTypeDesigner : CellTypeDesigner<TreeGridToolPluginCellType>
     {
         public override FrameworkElement GetDrawingControl(ICellInfo cellInfo, IDrawingHelper drawingHelper)

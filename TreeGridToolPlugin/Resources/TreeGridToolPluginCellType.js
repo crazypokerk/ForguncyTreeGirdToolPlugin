@@ -6,6 +6,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     columnsConfig;
     cellTypeMap;
     cellIsEditMap;
+    columnsProperties;
+    relations = new Map();
     
     cellType = {
         0: "text",
@@ -38,8 +40,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             .addClass("wb-skeleton wb-no-select wunderbaum wb-grid wb-ext-keynav wb-ext-edit wb-ext-filter wb-ext-dnd wb-ext-grid wb-cell-mode");
         $outer.append($main).append($output).append($div);
         
-        const columnsProperties = this.CellElement.CellType.ColumnsProperties;
-        let columnsConfigObj =  this.#generateColumns(columnsProperties);
+        this.columnsProperties = this.CellElement.CellType.ColumnsProperties;
+        for(let item of this.columnsProperties) {
+            this.relations.set(item.Name, {cellType: item.CellType, jsonPropertyName: item.Id});
+        }
+        
+        let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
         this.columnsConfig = columnsConfigObj.cols;
         this.cellTypeMap = columnsConfigObj.cellTypeMap;
         this.cellIsEditMap = columnsConfigObj.cellIsEdit;
@@ -51,7 +57,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         await new Promise((resolve, reject) => {
             try {
                 this.getBindingDataSourceValue(this.CellElement.CellType.DataSource, null, data => {
-                    this.treeData = this.#buildTree(data);
+                    this.treeData = this.#buildNormalTree(data, this.relations);
                     resolve();
                 }, true);
             } catch (e) {
@@ -78,7 +84,6 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 // navigationModeOption: "row",
                 navigationModeOption: "startRow",
                 // navigationModeOption: "cell",
-                // source:"https://cdn.jsdelivr.net/gh/mar10/assets@master/wunderbaum/tree_department_M_p.json",
                 source: this.treeData,
                 types: {
                     department: { icon: "bi bi-diagram-3", colspan: true },
@@ -172,11 +177,11 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     #buildTree(rawData) {
         const idToIndexMap = {};
         rawData.forEach((node, index) => {
-           idToIndexMap[node.ID] = index; // 存储每个节点的索引
+           idToIndexMap[node.ID] = index;
         });
         
         const flatData = this.convertToFlatFormat(rawData, idToIndexMap);
-        
+        console.warn(flatData)
         return {
             "_format": "flat",
             "_positional": ["title", "key", "type"],
@@ -184,21 +189,64 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         }
     }
     
+    #buildNormalTree(originalData, relationMap) {
+        const map = {};
+        const roots = [];
+        originalData.forEach(item => {
+            map[item.ID] = { ...item };
+        });
+        originalData.forEach(item => {
+            const obj = {
+                ID: item.ID,
+                PID: item.PID,
+                ...getSpecifiedFields(item, relationMap)
+            };
+            if (item.PID === null) {
+                roots.push(obj);
+            } else {
+                if (!map[item.PID].children) {
+                    map[item.PID].children = [];
+                }
+                map[item.PID].children.push(obj);
+            }
+            // 将当前节点保存起来用于后续构建
+            map[item.ID] = obj;
+        });
+        return roots;
+        
+        function getSpecifiedFields(item, map) {
+            const result = {};
+            
+            map.forEach((value, key)=> {
+                if(value.jsonPropertyName.toLowerCase() === "title") {
+                    result[value.jsonPropertyName.toLowerCase()]= item[key];
+                }
+                result[value.jsonPropertyName] = item[key];
+                if (value.cellType === 3) {
+                    result[value.jsonPropertyName] =!!item[key]; // 转换为布尔值
+                } else if(value.cellType === 2) {
+                    result[value.jsonPropertyName] = item[key] === null ? '' : item[key];
+                }
+            })
+            return result;
+        }
+    }
+    
     convertToFlatFormat(data, idToIndexMap) {
         const flatData = [];
         data.forEach((node) => {
             const parentIndex = node.PID !== null ? idToIndexMap[node.PID] : null;
-            flatData.push([
+            flatData.push([ 
                 parentIndex,
-                node.Title,
+                node['标题'],
                 node.ID.toString(),
                 "defaultType",
                 {
-                    age: node.Age,
-                    date: node.Date,
-                    status: node.Status,
-                    avail: node.Avail_,
-                    remarks: node.Remarks
+                    Age: node['年龄'],
+                    Date: node['日期'],
+                    Status: node['状态'],
+                    Avail_: node['是否'],
+                    Remarks: node['备注']
                 }
             ]);
         });
@@ -214,7 +262,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         customColumns.forEach((item)=> {
             cols.push({
                 title: item.Name,
-                id: item.Id,
+                id: item.Id.toLowerCase() === "title" ? '*' : item.Id,
                 width: item.Width == null ? "*" : `${item.Width}px`,
                 classes: this.columnsStyleType[item.ColumnStyle]
             });

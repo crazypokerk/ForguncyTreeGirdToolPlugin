@@ -13,8 +13,8 @@ namespace TreeGridToolPlugin
     {
         [BindingDataSourceProperty(
             AllowAddCustomColumns = true,
-            Columns = "ID|PID",
-            ColumnsDescription = "ID:ID列|PID:父级ID列",
+            Columns = "ID|PID|Type|Title",
+            ColumnsDescription = "ID:ID列|PID:父级ID列|Type:图标列|Title:标题列",
             IsIdPidStructure = true, 
             TreeIdColumnName = "ID", 
             TreePidColumnName = "PID"
@@ -38,10 +38,22 @@ namespace TreeGridToolPlugin
         {
         }
         
+        [DisplayName("获取更新数据信息")]
+        [RunTimeMethod]
+        public GetUpdateDataJson GetUpdateData()
+        {
+            return null;
+        }
+        
         public override string ToString()
         {
             return "树形工具单元格";
         }
+    }
+
+    public class GetUpdateDataJson
+    {
+        public string UpdateDataJson { get; set; }
     }
     public class ColumnObject : ObjectPropertyBase, INamedObject
     {

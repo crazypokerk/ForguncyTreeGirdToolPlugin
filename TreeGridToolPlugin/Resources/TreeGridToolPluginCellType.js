@@ -7,7 +7,9 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     cellTypeMap;
     cellIsEditMap;
     columnsProperties;
+    types = {};
     relations = new Map();
+    updateData = new Map();
     
     cellType = {
         0: "text",
@@ -43,6 +45,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         this.columnsProperties = this.CellElement.CellType.ColumnsProperties;
         for(let item of this.columnsProperties) {
             this.relations.set(item.Name, {cellType: item.CellType, jsonPropertyName: item.Id});
+        }
+        
+        this.types = {
+            '部门': { icon: "bi bi-1-circle-fill", colspan: true },
+            '经理': { icon: "bi bi-2-circle-fill", colspan: true },
+            '员工': { icon: "bi bi-3-circle-fill" },
         }
         
         let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
@@ -85,11 +93,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 navigationModeOption: "startRow",
                 // navigationModeOption: "cell",
                 source: this.treeData,
-                types: {
-                    department: { icon: "bi bi-diagram-3", colspan: true },
-                    role: { icon: "bi bi-microsoft-teams", colspan: true },
-                    person: { icon: "bi bi-person" },
-                },
+                types: this.types,
                 columns: this.columnsConfig,
                 columnsResizable: true,
                 columnsSortable: true,
@@ -144,18 +148,26 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                         e.tree.sortByProperty({ colId: e.info.colId, updateColInfo: true });
                     }
                 },
-                change: function (e) {
+                change: (e) => {
+                    console.warn(this.updateData)
                     const util = e.util;
                     const node = e.node;
                     const info = e.info;
+                    console.warn(info)
                     const colId = info.colId;
-                    this.logDebug(`change(${colId})`, util.getValueFromElem(e.inputElem, true));
-                    // For demo purposes, simulate a backend delay:
+                    e.tree.logDebug(`change(${colId})`, util.getValueFromElem(e.inputElem, true));
+
+                    this.updateData.set(`${info.node.data.ID}-${colId}`, {
+                        PID: info.node.data.PID,
+                        ChangedColId: colId,
+                        oldValue: info.node.data[colId],
+                        newValue: util.getValueFromElem(e.inputElem, true)
+                    });
                     return util.setTimeoutPromise(() => {
                         node.data[colId] = util.getValueFromElem(e.inputElem, true);
-                    }, 500);
+                    }, 0);
                 },
-                render: (e)=>  {
+                render: (e) => {
                     const node = e.node;
                     const util = e.util;
                     for (const col of Object.values(e.renderColInfosById)) {
@@ -199,6 +211,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             const obj = {
                 ID: item.ID,
                 PID: item.PID,
+                type: item.Type,
                 ...getSpecifiedFields(item, relationMap)
             };
             if (item.PID === null) {
@@ -312,6 +325,16 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     GetTreeData(tree) {
         if(tree === null) return;
         tree.toDictArray();
+    }
+
+    GetUpdateData() {
+        const obj = {};
+        for(const [key, value] of this.updateData.entries()) {
+            if (typeof key === 'string' || typeof key === 'number') {
+                obj[key] = value;
+            }
+        }
+        return {UpdateDataJson: obj}
     }
 }
 

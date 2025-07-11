@@ -32,17 +32,18 @@ namespace TreeGridToolPlugin
         [ObjectListProperty(ItemType = typeof(TypeObject))]
         public List<INamedObject> TypesProperties { get; set; }
         
+        [DisplayName("是否开启选择行")]
+        public bool IsCheckbox { get; set; }
+        
         [DisplayName("设置数据")]
         [RunTimeMethod]
         public void SetTreeData()
-        {
-        }
+        { }
         
         [DisplayName("获取数据")]
         [RunTimeMethod]
         public void GetTreeData()
-        {
-        }
+        { }
         
         [DisplayName("获取更新数据信息")]
         [RunTimeMethod]
@@ -50,6 +51,11 @@ namespace TreeGridToolPlugin
         {
             return null;
         }
+        
+        [DisplayName("展开/收起所有节点")]
+        [RunTimeMethod]
+        public void ToggleExpandAll()
+        { }
         
         public override string ToString()
         {
@@ -132,6 +138,14 @@ namespace TreeGridToolPlugin
         WbHelperLink = 6,
         // [Description("wb-helper-lazy-expander")]
         // WbHelperLazyExpander
+    }
+    
+    public enum CheckboxType
+    {
+        [Description("复选框")]
+        Checkbox = 0,
+        [Description("单选框")]
+        Radio = 1
     }
     
     public class TreeGirdPluginCellTypeDesigner : CellTypeDesigner<TreeGridToolPluginCellType>

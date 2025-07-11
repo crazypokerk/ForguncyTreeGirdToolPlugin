@@ -10,6 +10,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     types = {};
     relations = new Map();
     updateData = new Map();
+    ForguncyTree = null;
+    checkbox = false;
     
     cellType = {
         0: "text",
@@ -52,6 +54,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             this.types[item.Level] = { icon: item.Name, colspan: item.IsColspan === undefined ? false : item.IsColspan};
         }
         
+        this.checkbox = this.CellElement.CellType.IsCheckbox === undefined? false : this.CellElement.CellType.IsCheckbox;
+        
         let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
         this.columnsConfig = columnsConfigObj.cols;
         this.cellTypeMap = columnsConfigObj.cellTypeMap;
@@ -81,16 +85,14 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         })
         
         try {
-            let tree= new mar10.Wunderbaum({
+            let ForguncyTree= new mar10.Wunderbaum({
                 id: "demo",
                 element: document.getElementById("demo-tree"),
                 debugLevel: 5,
                 connectTopBreadcrumb: "output#parentPath",
-                checkbox: true,
+                checkbox: this.checkbox,
                 // fixedCol: true,
-                // navigationModeOption: "row",
-                navigationModeOption: "startRow",
-                // navigationModeOption: "cell",
+                navigationModeOption: "cell",
                 source: this.treeData,
                 types: this.types,
                 columns: this.columnsConfig,
@@ -178,7 +180,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                     }
                 },
             });
-            window.tree = tree;
+            window.tree = ForguncyTree;
+            this.ForguncyTree = ForguncyTree;
         } catch (e) {
             window.tree = null;
             throw new Error(e);
@@ -334,6 +337,10 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             }
         }
         return {UpdateDataJson: obj}
+    }
+    
+    ToggleExpandAll() {
+        this.ForguncyTree.expandAll(!this.ForguncyTree.getFirstChild().isExpanded());
     }
 }
 

@@ -66,6 +66,14 @@ namespace TreeGridToolPlugin
         public void ToggleSelectAll()
         { }
 
+        [DisplayName("启用/禁用树形表")]
+        [RunTimeMethod]
+        public void SetTreeDisabled(
+            [ItemDisplayName("选择")]
+            [ComboProperty(ValueList = "启用|禁用")]
+            string enabled)
+        { }
+
         public override bool GetDesignerPropertyVisible(string propertyName)
         {
             if (propertyName == nameof(MultipleProperty))

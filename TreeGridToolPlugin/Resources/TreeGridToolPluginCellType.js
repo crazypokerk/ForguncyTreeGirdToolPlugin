@@ -187,6 +187,9 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                         }
                     }
                 },
+                lazyLoad: (e) => {
+                    console.warn(`lazy---eee---${e}`);
+                }
             });
             window.tree = ForguncyTree;
             this.ForguncyTree = ForguncyTree;
@@ -356,6 +359,15 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         if(this.checkbox) {
             this.ForguncyTree.toggleSelect();
         }
+    }
+    
+    SetTreeDisabled(enabled) {
+        if(enabled === '禁用') {
+            this.ForguncyTree.setOption("enabled", false);
+        } else {
+            this.ForguncyTree.setOption("enabled", true);
+        }
+        
     }
 }
 

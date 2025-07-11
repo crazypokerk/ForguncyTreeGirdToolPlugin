@@ -44,13 +44,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         
         this.columnsProperties = this.CellElement.CellType.ColumnsProperties;
         for(let item of this.columnsProperties) {
-            this.relations.set(item.Name, {cellType: item.CellType, jsonPropertyName: item.Id});
+            this.relations.set(item.Id, {cellType: item.CellType, jsonPropertyName: item.Id});
         }
         
-        this.types = {
-            '部门': { icon: "bi bi-1-circle-fill", colspan: true },
-            '经理': { icon: "bi bi-2-circle-fill", colspan: true },
-            '员工': { icon: "bi bi-3-circle-fill" },
+        this.typesProperties = this.CellElement.CellType.TypesProperties;
+        for(let item of this.typesProperties) {
+            this.types[item.Level] = { icon: item.Name, colspan: item.IsColspan === undefined ? false : item.IsColspan};
         }
         
         let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
@@ -101,7 +100,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                     return `${e.node.title} (${e.node.key})`;
                 },
                 edit: {
-                    trigger: ["clickActive", "F2"], // "macEnter"],
+                    trigger: ["clickActive", "F2"],
                     select: true,
                     showClickDelay: 1000,
                     beforeEdit: function (e) {

@@ -23,8 +23,14 @@ namespace TreeGridToolPlugin
         public object DataSource { get; set; }
         
         [DisplayName("列名配置")]
+        [Description("注意，列名配置的列名属性值必须与绑定数据源的列名一致，否则会导致数据显示异常")]
         [ObjectListProperty(ItemType = typeof(ColumnObject))]
         public List<INamedObject> ColumnsProperties { get; set; }
+        
+        [DisplayName("图标配置")]
+        [Description("此配置用于配置树型表每一层级的图标样式，注意，图标配置的层级属性值必须与绑定数据源的层级一致，否则会导致数据显示异常")]
+        [ObjectListProperty(ItemType = typeof(TypeObject))]
+        public List<INamedObject> TypesProperties { get; set; }
         
         [DisplayName("设置数据")]
         [RunTimeMethod]
@@ -75,6 +81,21 @@ namespace TreeGridToolPlugin
         [DisplayName("是否可编辑")]
         [DefaultValue(false)]
         public bool Editable { get; set; }
+    }
+
+    public class TypeObject : ObjectPropertyBase, INamedObject
+    {
+        [DisplayName("图标类名")]
+        [Description("图标类名需要在Bootstrap Icon中查找，例如：bi bi-person")]
+        public string Name { get; set; }
+        
+        [DisplayName("层级")]
+        [Description("层级从1开始，层级为1的图标会显示第一层级的行，层级为2的图标会显示在第二层级的行，以此类推")]
+        public string Level { get; set; }
+        
+        [DisplayName("是否首行单元格合并为一行")]
+        [Description("如果当前行只需要展示第一行数据，可以合并当前行的列，默认值为false")]
+        public bool IsColspan { get; set; }
     }
     
     public enum CellTypeEnum

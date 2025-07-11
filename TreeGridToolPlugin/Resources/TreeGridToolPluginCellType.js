@@ -225,6 +225,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 ID: item.ID,
                 PID: item.PID,
                 type: item.Type,
+                selected: false,
                 ...getSpecifiedFields(item, relationMap)
             };
             if (item.PID === null) {
@@ -288,7 +289,6 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         customColumns.forEach((item)=> {
             cols.push({
                 title: item.Name,
-                selected: true,
                 id: item.Id.toLowerCase() === "title" ? '*' : item.Id,
                 width: item.Width == null ? "*" : `${item.Width}px`,
                 classes: this.columnsStyleType[item.ColumnStyle]
@@ -367,7 +367,6 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         } else {
             this.ForguncyTree.setOption("enabled", true);
         }
-        
     }
 }
 

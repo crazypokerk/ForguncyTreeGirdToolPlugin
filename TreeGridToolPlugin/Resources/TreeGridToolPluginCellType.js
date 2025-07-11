@@ -12,6 +12,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     updateData = new Map();
     ForguncyTree = null;
     checkbox = false;
+    selectMode = "multi";
     
     cellType = {
         0: "text",
@@ -31,6 +32,11 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         5: "wb-helper-invalid",
         6: "wb-helper-link"
     };
+    
+    multipleType = {
+        0: "multi",
+        1: "hier"
+    }
     createContent() {
         const $outer = $("<div style='width:100%;height:70%'>")
            .attr("id", "outer")
@@ -55,6 +61,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         }
         
         this.checkbox = this.CellElement.CellType.IsCheckbox === undefined? false : this.CellElement.CellType.IsCheckbox;
+        this.selectMode = this.multipleType[this.CellElement.CellType.MultipleProperty];
         
         let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
         this.columnsConfig = columnsConfigObj.cols;
@@ -91,6 +98,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 debugLevel: 5,
                 connectTopBreadcrumb: "output#parentPath",
                 checkbox: this.checkbox,
+                selectMode: this.selectMode,
                 // fixedCol: true,
                 navigationModeOption: "cell",
                 source: this.treeData,
@@ -277,6 +285,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         customColumns.forEach((item)=> {
             cols.push({
                 title: item.Name,
+                selected: true,
                 id: item.Id.toLowerCase() === "title" ? '*' : item.Id,
                 width: item.Width == null ? "*" : `${item.Width}px`,
                 classes: this.columnsStyleType[item.ColumnStyle]
@@ -341,6 +350,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     
     ToggleExpandAll() {
         this.ForguncyTree.expandAll(!this.ForguncyTree.getFirstChild().isExpanded());
+    }
+
+    ToggleSelectAll() {
+        if(this.checkbox) {
+            this.ForguncyTree.toggleSelect();
+        }
     }
 }
 

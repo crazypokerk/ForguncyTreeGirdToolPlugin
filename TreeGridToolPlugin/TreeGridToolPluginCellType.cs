@@ -35,6 +35,10 @@ namespace TreeGridToolPlugin
         [DisplayName("是否开启选择行")]
         public bool IsCheckbox { get; set; }
         
+        [DisplayName("多选时策略")]
+        [Description("多选时策略，默认为单行多选，即每次只能选择一行数据，如需多选下级数据，请选择下级多选")]
+        public MultipleType MultipleProperty { get; set; }
+        
         [DisplayName("设置数据")]
         [RunTimeMethod]
         public void SetTreeData()
@@ -57,6 +61,20 @@ namespace TreeGridToolPlugin
         public void ToggleExpandAll()
         { }
         
+        [DisplayName("全选/取消全选")]
+        [RunTimeMethod]
+        public void ToggleSelectAll()
+        { }
+
+        public override bool GetDesignerPropertyVisible(string propertyName)
+        {
+            if (propertyName == nameof(MultipleProperty))
+            {
+                return IsCheckbox;
+            }
+            return base.GetDesignerPropertyVisible(propertyName);
+        }
+
         public override string ToString()
         {
             return "树形工具单元格";
@@ -67,6 +85,7 @@ namespace TreeGridToolPlugin
     {
         public string UpdateDataJson { get; set; }
     }
+    
     public class ColumnObject : ObjectPropertyBase, INamedObject
     {
         [DisplayName("列名")]
@@ -118,6 +137,14 @@ namespace TreeGridToolPlugin
         Select = 4,
         [Description("时间")]
         Link = 5
+    }
+    
+    public enum MultipleType
+    {
+        [Description("单行多选")]
+        Multi = 0,
+        [Description("下级多选")]
+        Hier = 1
     }
 
     public enum ColumnClass

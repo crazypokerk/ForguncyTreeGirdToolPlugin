@@ -39,6 +39,9 @@ namespace TreeGridToolPlugin
         [Description("多选时策略，默认为单行多选，即每次只能选择一行数据，如需多选下级数据，请选择下级多选")]
         public MultipleType MultipleProperty { get; set; }
         
+        [DisplayName("开启面包屑导航")]
+        public bool ConnectTopBreadcrumb { get; set; }
+        
         [DisplayName("设置数据")]
         [RunTimeMethod]
         public void SetTreeData()
@@ -49,7 +52,7 @@ namespace TreeGridToolPlugin
         public void GetTreeData()
         { }
         
-        [DisplayName("获取更新数据信息")]
+        [DisplayName("获取更新数据")]
         [RunTimeMethod]
         public GetUpdateDataJson GetUpdateData()
         {
@@ -74,6 +77,13 @@ namespace TreeGridToolPlugin
             string enabled)
         { }
 
+        [DisplayName("获取选中行数据")]
+        [RunTimeMethod]
+        public GetSelectedDataJson GetSelectedData()
+        {
+            return null;
+        }
+
         public override bool GetDesignerPropertyVisible(string propertyName)
         {
             if (propertyName == nameof(MultipleProperty))
@@ -92,6 +102,11 @@ namespace TreeGridToolPlugin
     public class GetUpdateDataJson
     {
         public string UpdateDataJson { get; set; }
+    }
+    
+    public class GetSelectedDataJson
+    {
+        public string SelectedDataJson { get; set; }
     }
     
     public class ColumnObject : ObjectPropertyBase, INamedObject

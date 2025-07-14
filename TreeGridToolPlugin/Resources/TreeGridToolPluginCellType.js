@@ -13,6 +13,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     ForguncyTree = null;
     checkbox = false;
     selectMode = "multi";
+    connectTopBreadcrumb = null;
     
     cellType = {
         0: "text",
@@ -62,6 +63,10 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         
         this.checkbox = this.CellElement.CellType.IsCheckbox === undefined? false : this.CellElement.CellType.IsCheckbox;
         this.selectMode = this.multipleType[this.CellElement.CellType.MultipleProperty];
+        this.connectTopBreadcrumb = this.CellElement.CellType.ConnectTopBreadcrumb === undefined? null : this.CellElement.CellType.ConnectTopBreadcrumb;
+        if(this.connectTopBreadcrumb === true) {
+            this.connectTopBreadcrumb = 'output#parentPath';
+        }
         
         let columnsConfigObj =  this.#generateColumns(this.columnsProperties);
         this.columnsConfig = columnsConfigObj.cols;
@@ -96,7 +101,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 id: "demo",
                 element: document.getElementById("demo-tree"),
                 debugLevel: 5,
-                connectTopBreadcrumb: "output#parentPath",
+                connectTopBreadcrumb: this.connectTopBreadcrumb,
                 checkbox: this.checkbox,
                 selectMode: this.selectMode,
                 // fixedCol: true,
@@ -348,7 +353,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 obj[key] = value;
             }
         }
-        return {UpdateDataJson: obj}
+        return {UpdateDataJson: JSON.stringify(obj)}
     }
     
     ToggleExpandAll() {
@@ -367,6 +372,20 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         } else {
             this.ForguncyTree.setOption("enabled", true);
         }
+    }
+
+    GetSelectedData() {
+        let selectedNodes = this.ForguncyTree.getSelectedNodes();
+        let selectedData = [];
+        selectedNodes.forEach((node)=> {
+            if(node.children !== null) {
+                node.children.forEach((child)=> {
+                    selectedData.push(child.data);
+                })
+            }
+            selectedData.push(node.data);
+        })
+        return {SelectedDataJson: JSON.stringify(selectedData)};
     }
 }
 

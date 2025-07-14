@@ -306,7 +306,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                 innerHTML = '<input type="text" tabindex="-1">';
                 break;
             case 1:
-                innerHTML = '<input type="number" min="0" tabindex="-1">';
+                innerHTML = '<input type="number" step="any" tabindex="-1">';
                 break;
             case 2:
                 innerHTML = '<input type="date" tabindex="-1">';

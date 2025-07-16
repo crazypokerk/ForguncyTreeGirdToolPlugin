@@ -8,7 +8,7 @@
   ],
   "javascript": [
     "Resources/js/lodash.min.js",
-    "Resources/js/wunderbaum.umd.min.js",
+    "Resources/js/wunderbaum.umd.js",
     "Resources/TreeGridToolPluginCellType.js",
     "Resources/TreeGridToolPluginCommand.js"
   ],

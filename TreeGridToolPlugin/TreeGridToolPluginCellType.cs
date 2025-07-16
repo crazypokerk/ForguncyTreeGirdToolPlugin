@@ -14,7 +14,7 @@ namespace TreeGridToolPlugin
         [BindingDataSourceProperty(
             AllowAddCustomColumns = true,
             Columns = "ID|PID|Type|Title",
-            ColumnsDescription = "ID:ID列|PID:父级ID列|Type:图标列|Title:标题列",
+            ColumnsDescription = "ID:ID列|PID:父级ID列|Type:层级列|Title:标题列",
             IsIdPidStructure = true, 
             TreeIdColumnName = "ID", 
             TreePidColumnName = "PID"
@@ -27,8 +27,8 @@ namespace TreeGridToolPlugin
         [ObjectListProperty(ItemType = typeof(ColumnObject))]
         public List<INamedObject> ColumnsProperties { get; set; }
         
-        [DisplayName("图标配置")]
-        [Description("此配置用于配置树型表每一层级的图标样式，注意，图标配置的层级属性值必须与绑定数据源的层级一致，否则会导致数据显示异常")]
+        [DisplayName("层级配置")]
+        [Description("此配置用于配置树型表每一层级的配置，所以需要有一列数据表示当前行的层级；注意，图标配置的层级属性值必须与绑定数据源的层级一致，否则会导致数据显示异常")]
         [ObjectListProperty(ItemType = typeof(TypeObject))]
         public List<INamedObject> TypesProperties { get; set; }
         
@@ -144,6 +144,10 @@ namespace TreeGridToolPlugin
         [DisplayName("是否首行单元格合并为一行")]
         [Description("如果当前行只需要展示第一行数据，可以合并当前行的列，默认值为false")]
         public bool IsColspan { get; set; }
+        
+        [DisplayName("异步加载数据")]
+        [Description("如果当前层级的数据需要异步加载，可以勾选此选项，但需注意，当前层级节点在第一次加载时不能有子节点，否则不会触发异步加载数据")]
+        public bool IsAsyncLoadData { get; set; }
     }
     
     public enum CellTypeEnum

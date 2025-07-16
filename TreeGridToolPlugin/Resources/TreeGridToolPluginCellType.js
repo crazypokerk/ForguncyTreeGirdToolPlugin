@@ -229,22 +229,27 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                         };
 
                         const curData = await this.#getBindingDataWithOptions(bindingDataSourceModel, queryDataOption, 1);
-                        
-                        for (const rowData of curData) {
-                            let curTreeData = [];
-                            curTreeData.push(rowData);
-                            let curRowDataType = rowData.Type;
-                            let curIsAsync = this.levelMap.get(curRowDataType)?.asyncLoadData || false;
-                            if (!curIsAsync) {
-                                await this.#loadRecursiveData(bindingDataSourceModel, rowData.ID, curTreeData);
-                            } else {
-                                break;
-                            }
-                            
-                            const childTree = this.#buildNormalTree(curTreeData, this.relations, true, rowData.ID);
-                            e.node.addNode(childTree[0], "appendChild");
-                            e.node.setExpanded(true);
+                        if(curData.length === 0 || curData === []) {
+                            await e.node.setExpanded(true);
+                            e.node.setStatus('noData')
                             e.node._isLoading = false;
+                        } else {
+                            for (const rowData of curData) {
+                                let curTreeData = [];
+                                curTreeData.push(rowData);
+                                let curRowDataType = rowData.Type;
+                                let curIsAsync = this.levelMap.get(curRowDataType)?.asyncLoadData || false;
+                                if (!curIsAsync) {
+                                    await this.#loadRecursiveData(bindingDataSourceModel, rowData.ID, curTreeData);
+                                } else {
+                                    break;
+                                }
+
+                                const childTree = this.#buildNormalTree(curTreeData, this.relations, true, rowData.ID);
+                                e.node.addNode(childTree[0], "appendChild");
+                                await e.node.setExpanded(true);
+                                e.node._isLoading = false;
+                            }
                         }
                     });
                 },
@@ -307,43 +312,42 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         }
     }
 
-    #buildNormalTree(originalData, relationMap, isBuildChildren = false, curNodeID) {
+    #buildNormalTree(originalData, relationMap, isBuildChildren = false, curNodeID = null) {
         const map = {};
         const roots = [];
         originalData.forEach(item => {
             map[item.ID] = {...item};
         });
         originalData.forEach(item => {
-            let currentItemAsynLoadDataFlag = this.levelMap.get(item.Type).asyncLoadData;
+            let isAsyncLoad = this.levelMap.get(item.Type)?.asyncLoadData || false;
             const obj = {
                 ID: item.ID,
                 PID: item.PID,
                 type: item.Type,
                 selected: false,
-                lazy: currentItemAsynLoadDataFlag,
+                lazy: isAsyncLoad,
                 ...getSpecifiedFields(item, relationMap)
             };
-            
-            if(isBuildChildren) {
-                if(curNodeID === item.ID) {
+
+            if (isBuildChildren) {
+                if (curNodeID === item.ID) {
                     map[item.ID].children = [];
                     roots.push(obj);
                 } else {
-                    if (!map[item.PID].children) {
-                        map[item.PID].children = [];
-                    }
-                    map[item.PID].children.push(obj);
+                    _addChildToParent(item, obj, map);
                 }
-                
             } else {
                 if (item.PID === null) {
                     roots.push(obj);
                 } else {
-                    if (!map[item.PID].children) {
-                        map[item.PID].children = [];
-                    }
-                    map[item.PID].children.push(obj);
+                    _addChildToParent(item, obj, map);
                 }
+            }
+            function _addChildToParent(item, obj, map) {
+                if (!map[item.PID].children) {
+                    map[item.PID].children = [];
+                }
+                map[item.PID].children.push(obj);
             }
             
             // 将当前节点保存起来用于后续构建

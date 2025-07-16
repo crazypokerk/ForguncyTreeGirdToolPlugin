@@ -146,7 +146,7 @@ namespace TreeGridToolPlugin
         public bool IsColspan { get; set; }
         
         [DisplayName("异步加载数据")]
-        [Description("如果当前层级的数据需要异步加载，可以勾选此选项，但需注意，当前层级节点在第一次加载时不能有子节点，否则不会触发异步加载数据")]
+        [Description("如果当前层级的数据需要异步加载，可以勾选此选项；并且下级勾选了该选项后，上级也都必须勾选！但需注意，当前层级节点在第一次加载时不能有子节点，否则不会触发异步加载数据")]
         public bool IsAsyncLoadData { get; set; }
     }
     

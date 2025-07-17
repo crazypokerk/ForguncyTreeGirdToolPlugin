@@ -42,6 +42,9 @@ namespace TreeGridToolPlugin
         [DisplayName("开启面包屑导航")]
         public bool ConnectTopBreadcrumb { get; set; }
         
+        [DisplayName("开启行拖拽")]
+        public bool IsDragAndDrop { get; set; }
+        
         [DisplayName("设置数据")]
         [RunTimeMethod]
         public void SetTreeData()

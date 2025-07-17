@@ -11,6 +11,8 @@
     _updateData = new Map();
     _ForguncyTree = null;
     _checkbox = false;
+    _dragAndDrop = false;
+    _dndOptionsType = {};
     _selectMode = "multi";
     _connectTopBreadcrumb = null;
     _levelMap = new Map();
@@ -34,6 +36,7 @@
         this._cellIsEditMap = treeGridOptionsFirstNeededParams.columnsConfigObj.cellIsEdit;
         this._columnsProperties = treeGridOptionsFirstNeededParams.columnsProperties;
         this._checkbox = treeGridOptionsFirstNeededParams.checkbox;
+        this._dragAndDrop = treeGridOptionsFirstNeededParams.dragAndDrop;
         this._selectMode = treeGridOptionsFirstNeededParams.selectMode;
         this._connectTopBreadcrumb = treeGridOptionsFirstNeededParams.connectTopBreadcrumb;
         for (let item of this._typesProperties) {
@@ -52,6 +55,49 @@
         for (let item of this._columnsProperties) {
             this._relations.set(item.Id, {cellType: item.CellType, jsonPropertyName: item.Id});
         }
+        
+        if(this._dragAndDrop) {
+            this._dndOptionsType = {
+                effectAllowed: "copy",
+                dragStart: (e) => {
+                    return true;
+                },
+                dragEnter: (e) => {
+                    return ["over", "before", "after"];
+                },
+                drag: (e) => {
+                    // e.tree.log(e.type, e);
+                },
+                drayOver: () => {
+
+                },
+                dragLeave: () => {
+
+                },
+                drop: (e) => {
+                    console.log(
+                        `Drop ${e.sourceNode} => ${e.suggestedDropEffect} ${e.suggestedDropMode} ${e.node}`,
+                        e
+                    );
+                    switch (e.suggestedDropEffect) {
+                        case "copy":
+                            e.node.addNode(
+                                {title: `Copy of ${e.sourceNodeData.title}`},
+                                e.suggestedDropMode
+                            );
+                            break;
+                        case "link":
+                            e.node.addNode(
+                                {title: `Link to ${e.sourceNodeData.title}`},
+                                e.suggestedDropMode
+                            );
+                            break;
+                        default:
+                            e.sourceNode.moveTo(e.node, e.suggestedDropMode);
+                    }
+                }
+            }
+        } 
     }
 
     set treeDom(value) {
@@ -118,6 +164,7 @@
                 columns: this._columnsConfig,
                 columnsResizable: true,
                 columnsSortable: true,
+                dnd: this._dndOptionsType,
                 tooltip: (e) => {
                     return `${e.node.title} (${e.node.key})`;
                 },
@@ -215,7 +262,7 @@
                                     break;
                                 }
 
-                                const childTree = this.buildNormalTree(curTreeData, this._relations, this._levelMap,true, rowData.ID);
+                                const childTree = this.buildNormalTree(curTreeData, this._relations, this._levelMap, true, rowData.ID);
                                 e.node.addNode(childTree[0], "appendChild");
                                 await e.node.setExpanded(true);
                                 e.node._isLoading = false;

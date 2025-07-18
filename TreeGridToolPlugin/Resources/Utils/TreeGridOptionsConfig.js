@@ -58,45 +58,26 @@
         
         if(this._dragAndDrop) {
             this._dndOptionsType = {
-                effectAllowed: "copy",
                 dragStart: (e) => {
+                    if (e.node.type === "folder") {
+                        return false;
+                    }
+                    e.event.dataTransfer.effectAllowed = "all";
                     return true;
                 },
                 dragEnter: (e) => {
-                    return ["over", "before", "after"];
-                },
-                drag: (e) => {
-                    // e.tree.log(e.type, e);
-                },
-                drayOver: () => {
-
-                },
-                dragLeave: () => {
-
+                    if (e.node.type === "folder") {
+                        e.event.dataTransfer.dropEffect = "copy";
+                        return "over";
+                    }
+                    return ["before", "after"];
                 },
                 drop: (e) => {
-                    console.log(
-                        `Drop ${e.sourceNode} => ${e.suggestedDropEffect} ${e.suggestedDropMode} ${e.node}`,
-                        e
-                    );
-                    switch (e.suggestedDropEffect) {
-                        case "copy":
-                            e.node.addNode(
-                                {title: `Copy of ${e.sourceNodeData.title}`},
-                                e.suggestedDropMode
-                            );
-                            break;
-                        case "link":
-                            e.node.addNode(
-                                {title: `Link to ${e.sourceNodeData.title}`},
-                                e.suggestedDropMode
-                            );
-                            break;
-                        default:
-                            e.sourceNode.moveTo(e.node, e.suggestedDropMode);
-                    }
-                }
+                    console.log("Drop " + e.sourceNode + " => " + e.region + " " + e.node);
+                    e.sourceNode.moveTo(e.node, e.suggestedDropMode);
+                },
             }
+            
         } 
     }
 

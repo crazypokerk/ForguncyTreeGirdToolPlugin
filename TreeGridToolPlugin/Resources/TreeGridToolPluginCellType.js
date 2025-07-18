@@ -5,7 +5,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     TreeGridOptionsConfig;
 
     createContent() {
-        const $outer = $("<div style='width:100%;height:70%'>")
+        const $outer = $("<div style='width:100%;height:100%'>")
             .attr("id", "outer")
             .addClass("outer");
         const $main = $("<main>").addClass("view");

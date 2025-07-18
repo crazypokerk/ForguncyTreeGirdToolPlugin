@@ -132,7 +132,7 @@
     buildTreeGridOptions() {
         try {
             let ForguncyTree = new mar10.Wunderbaum({
-                id: "demo",
+                id: "fg-tree-1-0-0",
                 element: this._treeDom,
                 debugLevel: 1,
                 connectTopBreadcrumb: this._connectTopBreadcrumb,

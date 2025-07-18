@@ -45,6 +45,28 @@ namespace TreeGridToolPlugin
         [DisplayName("开启行拖拽")]
         public bool IsDragAndDrop { get; set; }
         
+        /**
+         * 样式配置
+         */
+        [DisplayName("表格字体")]
+        [FontFamilyProperty]
+        public string FontFamily { get; set; }
+        
+        [DisplayName("表格背景颜色")]
+        [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
+        public string TreeTableBackgroundColor { get; set; }
+        
+        [DisplayName("表格字体颜色")]
+        [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
+        public string TreeTableFontColor { get; set; }
+        
+        [DisplayName("表格边框颜色")]
+        [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
+        public string TreeTableBorderColor { get; set; }
+        
+        /**
+         * 操作命令
+         */
         [DisplayName("设置数据")]
         [RunTimeMethod]
         public void SetTreeData()

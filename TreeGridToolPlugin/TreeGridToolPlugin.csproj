@@ -53,6 +53,6 @@
     <Exec Command="&quot;..\PackageTools\ForguncyPluginPackageTool.exe&quot; &quot;$(ProjectDir).&quot; &quot;$(ProjectDir)$(OutputPath)$(AssemblyName).dll&quot; $(ConfigurationName)" />
   </Target>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="terser .\Resources\Utils\TreeGridColumnsConfig.js -o .\Resources\Utils\tgcc.js --mangle;terser .\Resources\Utils\TreeGridOptionsConfig.js -o .\Resources\Utils\tgoc.js --mangle" />
+    <Exec Command="terser .\Resources\Utils\TreeGridOptionsConfig.js -o .\Resources\Utils\tgoc.js --mangle" />
   </Target>
 </Project>

@@ -10,7 +10,7 @@
     "Resources/js/lodash.min.js",
     "Resources/js/wunderbaum.umd.js",
     "Resources/Utils/tgoc.js",
-    "Resources/Utils/tgcc.js",
+    "Resources/Utils/TreeGridColumnsConfig.js",
     "Resources/TreeGridToolPluginCellType.js",
     "Resources/TreeGridToolPluginCommand.js"
   ],

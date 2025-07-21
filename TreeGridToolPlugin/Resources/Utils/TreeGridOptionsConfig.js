@@ -18,6 +18,7 @@
     _levelMap = new Map();
     _bindingDataSourceModel = null;
     _treeGridToolPluginCellType = null;
+    _currentLevelRowBackgroundColorMap = new Map();
 
     cellType = {
         0: "text",
@@ -40,9 +41,12 @@
         this._selectMode = treeGridOptionsFirstNeededParams.selectMode;
         this._connectTopBreadcrumb = treeGridOptionsFirstNeededParams.connectTopBreadcrumb;
         for (let item of this._typesProperties) {
+            this._currentLevelRowBackgroundColorMap.set(item.Level, item.CurrentLevelRowBackgroundColor === undefined ? null : item.CurrentLevelRowBackgroundColor);
+        }
+        for (let item of this._typesProperties) {
             this._types[item.Level] = {
                 icon: item.Name,
-                colspan: item.IsColspan === undefined ? false : item.IsColspan
+                colspan: item.IsColspan === undefined ? false : item.IsColspan,
             }
         }
         for (let item of this._typesProperties) {
@@ -55,8 +59,8 @@
         for (let item of this._columnsProperties) {
             this._relations.set(item.Id, {cellType: item.CellType, jsonPropertyName: item.Id});
         }
-        
-        if(this._dragAndDrop) {
+
+        if (this._dragAndDrop) {
             this._dndOptionsType = {
                 dragStart: (e) => {
                     if (e.node.type === "folder") {
@@ -77,8 +81,8 @@
                     e.sourceNode.moveTo(e.node, e.suggestedDropMode);
                 },
             }
-            
-        } 
+
+        }
     }
 
     set treeDom(value) {
@@ -254,6 +258,8 @@
                 render: (e) => {
                     const node = e.node;
                     const util = e.util;
+                    const nodeElement = e.nodeElem;
+                    nodeElement.style.setProperty("background-color", Forguncy.ConvertToCssColor(this._currentLevelRowBackgroundColorMap.get(e.node.type)));
                     for (const col of Object.values(e.renderColInfosById)) {
                         const val = node.data[col.id];
                         if (e.isNew) {

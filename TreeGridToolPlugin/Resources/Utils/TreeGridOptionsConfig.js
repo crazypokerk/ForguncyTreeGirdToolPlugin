@@ -237,7 +237,8 @@
                         let queryConditions = [{columnName: "PID", compareType: 0, compareValue: currentLevelData.ID}];
                         let queryDataOption = {queryConditions};
                         const curData = await this.getBindingDataWithOptions(queryDataOption, 1);
-                        if (curData.length === 0 || curData === []) {
+                        // 这里要判断的原因是，有可能当前已经是叶子结点，没有子结点了，第一种情况是因为数据表加了查询条件
+                        if (curData.ID === undefined || curData.length === 0 || curData === []) {
                             await e.node.setExpanded(true);
                             e.node.setStatus('noData')
                             e.node._isLoading = false;

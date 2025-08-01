@@ -133,6 +133,13 @@
         return this._bindingDataSourceModel;
     }
 
+    reloadTreeData(newData) {
+        if(newData !== null || true) {
+            this._treeData = newData;
+            this._ForguncyTree.load(newData);
+        }
+    }
+
     buildTreeGridOptions() {
         try {
             let ForguncyTree = new mar10.Wunderbaum({
@@ -187,6 +194,9 @@
                     //     matchInfoElem: "#filter-match-info",
                     // },
                 },
+                load: (e) => {
+                    console.warn('reload')
+                },
                 init: (e) => {
                     const tree = e.tree;
                     // e.tree.findFirst("整车总成 A").setExpanded(false);
@@ -224,12 +234,8 @@
                 lazyLoad: async (e) => {
                     return new Promise(async (resolve, reject) => {
                         let currentLevelData = e.node.data;
-                        let queryConditions = [];
-                        queryConditions.push({columnName: "PID", compareType: 0, compareValue: currentLevelData.ID})
-                        let queryDataOption = {
-                            queryConditions: queryConditions
-                        };
-
+                        let queryConditions = [{columnName: "PID", compareType: 0, compareValue: currentLevelData.ID}];
+                        let queryDataOption = {queryConditions};
                         const curData = await this.getBindingDataWithOptions(queryDataOption, 1);
                         if (curData.length === 0 || curData === []) {
                             await e.node.setExpanded(true);
@@ -276,10 +282,10 @@
     }
 
     buildNormalTree(originalData, relationMap, levelMap, isBuildChildren = false, curNodeID = null) {
-        const map = {};
+        const dataObject = {};
         const roots = [];
         originalData.forEach(item => {
-            map[item.ID] = {...item};
+            dataObject[item.ID] = {...item};
         });
         originalData.forEach(item => {
             let isAsyncLoad = this._levelMap.get(item.Type)?.asyncLoadData || false;
@@ -294,28 +300,29 @@
 
             if (isBuildChildren) {
                 if (curNodeID === item.ID) {
-                    map[item.ID].children = [];
+                    dataObject[item.ID].children = [];
                     roots.push(obj);
                 } else {
-                    _addChildToParent(item, obj, map);
+                    _addChildToParent(item, obj, dataObject);
                 }
             } else {
-                if (item.PID === null) {
+                // 构件子树的时候，因为子树的PID肯定不会空，但是子树的PID肯定不在dataObject的属性名中
+                if (item.PID === null || !Object.hasOwn(dataObject, item.PID)) {
                     roots.push(obj);
                 } else {
-                    _addChildToParent(item, obj, map);
+                    _addChildToParent(item, obj, dataObject);
                 }
             }
 
-            function _addChildToParent(item, obj, map) {
-                if (!map[item.PID].children) {
-                    map[item.PID].children = [];
+            function _addChildToParent(item, obj, dataObject) {
+                if (dataObject[item.PID] !== undefined && !dataObject[item.PID].children) {
+                    dataObject[item.PID].children = [];
                 }
-                map[item.PID].children.push(obj);
+                dataObject[item.PID].children.push(obj);
             }
 
             // 将当前节点保存起来用于后续构建
-            map[item.ID] = obj;
+            dataObject[item.ID] = obj;
         });
         return roots;
 
@@ -338,12 +345,23 @@
     }
 
     async getBindingDataWithOptions(queryDataOption, flag = 0) {
+        let emptyData = [{
+            "type": null,
+            "title": "",
+            "children": null
+        }];
         return new Promise((resolve, reject) => {
             try {
                 this._treeGridToolPluginCellType.getBindingDataSourceValue(this._bindingDataSourceModel, queryDataOption, data => {
+                    // 1. 优先处理空数据情况（最简分支提前返回）
+                    if (data.length === 0) {
+                        resolve(emptyData);
+                    }
+                    // 2. 非空数据时，根据 flag 值处理
                     if (flag === 0) {
                         resolve(this.buildNormalTree(data, this._relations, this._levelMap, false));
-                    } else if (flag === 1) {
+                    }
+                    if (flag === 1) {
                         resolve(data);
                     }
                 }, true);
@@ -352,11 +370,7 @@
                 reject(e);
             } finally {
                 if (this._treeData == null) {
-                    this._treeData = [{
-                        "type": null,
-                        "title": "",
-                        "children": null
-                    }];
+                    this._treeData = emptyData;
                 }
             }
         })

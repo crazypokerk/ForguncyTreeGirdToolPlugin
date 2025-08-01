@@ -53,9 +53,16 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             queryConditions: queryConditions,
             relationType
         };
-
+        
+        // first loading
         this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
         this.TreeGridOptionsConfig.buildTreeGridOptions();
+
+        // value changed loading
+        this.onBindingDataSourceDependenceCellValueChanged(this.TreeGridOptionsConfig.bindingDataSourceModel, async () => {
+            this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
+            this.TreeGridOptionsConfig.reloadTreeData(this.TreeGridOptionsConfig.treeData);
+        });
     }
 
     #updateWunderbaumStyles(cellType) {

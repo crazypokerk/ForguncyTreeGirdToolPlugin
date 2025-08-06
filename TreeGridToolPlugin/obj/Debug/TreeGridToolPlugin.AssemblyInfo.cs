@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TreeGridToolPlugin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5be3f0a9d1b10060102f28110a01667c149fb784")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ddd2e637474d8c2f0deea919b8e49fe1dceac7ad")]
 [assembly: System.Reflection.AssemblyProductAttribute("TreeGridToolPlugin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TreeGridToolPlugin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

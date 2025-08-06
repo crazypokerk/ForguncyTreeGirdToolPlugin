@@ -30,8 +30,8 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
             columnsProperties: this.CellElement.CellType.ColumnsProperties,
             checkbox: this.CellElement.CellType.IsCheckbox === undefined ? false : this.CellElement.CellType.IsCheckbox,
             dragAndDrop: this.CellElement.CellType.IsDragAndDrop === undefined ? false : this.CellElement.CellType.IsDragAndDrop,
-            selectMode: "multi",
-            connectTopBreadcrumb: this.CellElement.CellType.ConnectTopBreadcrumb === undefined ? null : this.CellElement.CellType.ConnectTopBreadcrumb,
+            selectMode: this.CellElement.CellType.MultipleProperty,
+            connectTopBreadcrumb: this.CellElement.CellType.ConnectTopBreadcrumb === undefined ? false : this.CellElement.CellType.ConnectTopBreadcrumb,
         }
 
         this.TreeGridOptionsConfig = new TreeGridOptionsConfig(treeGridOptionsFirstNeededParams);

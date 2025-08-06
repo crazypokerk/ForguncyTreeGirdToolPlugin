@@ -14,7 +14,7 @@
     _dragAndDrop = false;
     _dndOptionsType = {};
     _selectMode = "multi";
-    _connectTopBreadcrumb = null;
+    _connectTopBreadcrumb = false;
     _levelMap = new Map();
     _bindingDataSourceModel = null;
     _treeGridToolPluginCellType = null;
@@ -28,6 +28,11 @@
         4: "select",
         5: "link",
     }
+    
+    SELECT_MODE = {
+        0: "multi",
+        1: "hier"
+    }
 
     constructor(treeGridOptionsFirstNeededParams) {
         this._treeGridToolPluginCellType = treeGridOptionsFirstNeededParams.TreeGridToolPluginCellType;
@@ -38,8 +43,8 @@
         this._columnsProperties = treeGridOptionsFirstNeededParams.columnsProperties;
         this._checkbox = treeGridOptionsFirstNeededParams.checkbox;
         this._dragAndDrop = treeGridOptionsFirstNeededParams.dragAndDrop;
-        this._selectMode = treeGridOptionsFirstNeededParams.selectMode;
-        this._connectTopBreadcrumb = treeGridOptionsFirstNeededParams.connectTopBreadcrumb;
+        this._selectMode =  this.SELECT_MODE[treeGridOptionsFirstNeededParams.selectMode];
+        this._connectTopBreadcrumb = treeGridOptionsFirstNeededParams.connectTopBreadcrumb === false ? null : "output#parentPath";
         for (let item of this._typesProperties) {
             this._currentLevelRowBackgroundColorMap.set(item.Level, item.CurrentLevelRowBackgroundColor === undefined ? null : item.CurrentLevelRowBackgroundColor);
         }
@@ -352,6 +357,9 @@
             "children": null
         }];
         return new Promise((resolve, reject) => {
+            if(this._bindingDataSourceModel === undefined || this._bindingDataSourceModel === null) {
+                resolve(emptyData);
+            }
             try {
                 this._treeGridToolPluginCellType.getBindingDataSourceValue(this._bindingDataSourceModel, queryDataOption, data => {
                     // 1. 优先处理空数据情况（最简分支提前返回）

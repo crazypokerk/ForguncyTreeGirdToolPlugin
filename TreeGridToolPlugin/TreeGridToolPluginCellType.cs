@@ -3,12 +3,13 @@ using GrapeCity.Forguncy.Plugin;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
 namespace TreeGridToolPlugin
 {
     [Icon("pack://application:,,,/TreeGridToolPlugin;component/Resources/Icon.png")]
-    [Designer(typeof(TreeGirdPluginCellTypeDesigner))]
+    [Designer(typeof(TreeGridToolPlugin.Designer.TreeGridToolPluginCellTypeDesigner))]
     public class TreeGridToolPluginCellType : CellType
     {
         [BindingDataSourceProperty(
@@ -44,10 +45,9 @@ namespace TreeGridToolPlugin
         
         [DisplayName("开启行拖拽")]
         public bool IsDragAndDrop { get; set; }
+
+        #region Style configuriton
         
-        /**
-         * 样式配置
-         */
         [DisplayName("表格字体")]
         [FontFamilyProperty]
         public string FontFamily { get; set; }
@@ -63,36 +63,90 @@ namespace TreeGridToolPlugin
         [DisplayName("表格边框颜色")]
         [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
         public string TreeTableBorderColor { get; set; }
+
+        #endregion
         
-        /**
-         * 操作命令
-         */
-        [DisplayName("设置数据")]
-        [RunTimeMethod]
-        public void SetTreeData()
-        { }
+        #region Run Time Method
+        
+        // [DisplayName("设置数据源(对象树)")]
+        // [RunTimeMethod]
+        // public void SetDataSourceByObjTree(
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("数据源")]
+        //     [Required]
+        //     string dataSource,
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("值属性名")]
+        //     [Description("值属性名")]
+        //     [Required]
+        //     string valueProperty = "value",
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("标签属性名")]
+        //     [Description("标签属性名")]
+        //     string labelProperty = "label",
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("子项目属性名")]
+        //     [Description("子项目属性名")]
+        //     [Required]
+        //     string childrenProperty = "children")
+        // {
+        // }
+        //
+        // [DisplayName("设置数据源(对象树)")]
+        // [RunTimeMethod]
+        // public void SetDataSourceByIdPidTable(
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("数据源")]
+        //     [Required]
+        //     string dataSource,
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("值属性名")]
+        //     [Required]
+        //     string valueProperty = "value",
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("标签属性名")]
+        //     [Description("")]
+        //     [Required]
+        //     string labelProperty = "label",
+        //     [FormulaProperty(CanSelectResource = false)]
+        //     [ItemDisplayName("父节点属性名")]
+        //     [Required]
+        //     string parentValue = "parentValue")
+        // {
+        // }
         
         [DisplayName("获取数据")]
         [RunTimeMethod]
         public void GetTreeData()
-        { }
+        {
+            // 调用JavaScript端GetTreeData方法获取树数据
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+        }
         
         [DisplayName("获取更新数据")]
         [RunTimeMethod]
         public GetUpdateDataJson GetUpdateData()
         {
-            return null;
+            // 调用JavaScript端GetUpdateData方法获取更新数据
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+            return new GetUpdateDataJson { UpdateDataJson = "{}" };
         }
         
         [DisplayName("展开/收起所有节点")]
         [RunTimeMethod]
         public void ToggleExpandAll()
-        { }
+        {
+            // 调用JavaScript端ToggleExpandAll方法切换节点展开状态
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+        }
         
         [DisplayName("全选/取消全选")]
         [RunTimeMethod]
         public void ToggleSelectAll()
-        { }
+        {
+            // 调用JavaScript端ToggleSelectAll方法切换全选状态
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+        }
 
         [DisplayName("启用/禁用树形表")]
         [RunTimeMethod]
@@ -100,14 +154,22 @@ namespace TreeGridToolPlugin
             [ItemDisplayName("选择")]
             [ComboProperty(ValueList = "启用|禁用")]
             string enabled)
-        { }
+        {
+            // 调用JavaScript端SetTreeDisabled方法启用/禁用树形表
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+            // enabled参数值为"启用"或"禁用"
+        }
 
         [DisplayName("获取选中行数据")]
         [RunTimeMethod]
         public GetSelectedDataJson GetSelectedData()
         {
-            return null;
+            // 调用JavaScript端GetSelectedData方法获取选中数据
+            // 注意：实际执行将由活字格框架自动转发到JavaScript端
+            return new GetSelectedDataJson { SelectedDataJson = "[]" };
         }
+        
+        #endregion
 
         public override bool GetDesignerPropertyVisible(string propertyName)
         {
@@ -218,24 +280,10 @@ namespace TreeGridToolPlugin
         [Description("列样式渲染为无效样式")]
         WbHelperInvalid = 5,
         [Description("列渲染为链接样式")]
-        WbHelperLink = 6,
-        // [Description("wb-helper-lazy-expander")]
-        // WbHelperLazyExpander
+        WbHelperLink = 6
     }
     
-    public enum CheckboxType
-    {
-        [Description("复选框")]
-        Checkbox = 0,
-        [Description("单选框")]
-        Radio = 1
-    }
+
     
-    public class TreeGirdPluginCellTypeDesigner : CellTypeDesigner<TreeGridToolPluginCellType>
-    {
-        public override FrameworkElement GetDrawingControl(ICellInfo cellInfo, IDrawingHelper drawingHelper)
-        {
-            return drawingHelper.GetHeadlessBrowserPreviewControl(); // 使用无头浏览器渲染设计时预览
-        }
-    }
+
 }

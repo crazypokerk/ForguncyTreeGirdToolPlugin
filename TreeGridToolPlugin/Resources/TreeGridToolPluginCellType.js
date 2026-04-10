@@ -59,10 +59,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         this.TreeGridOptionsConfig.buildTreeGridOptions();
 
         // value changed loading
-        this.onBindingDataSourceDependenceCellValueChanged(this.TreeGridOptionsConfig.bindingDataSourceModel, async () => {
-            this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
-            this.TreeGridOptionsConfig.reloadTreeData(this.TreeGridOptionsConfig.treeData);
-        });
+        if (this.TreeGridOptionsConfig.bindingDataSourceModel) {
+            this.onBindingDataSourceDependenceCellValueChanged(this.TreeGridOptionsConfig.bindingDataSourceModel, async () => {
+                this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
+                this.TreeGridOptionsConfig.reloadTreeData(this.TreeGridOptionsConfig.treeData);
+            });
+        }
     }
 
     #updateWunderbaumStyles(cellType) {
@@ -88,7 +90,7 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
                     document.documentElement.style.setProperty(cssVar, value);
                 }
             } catch (error) {
-                console.error(`Failed to set CSS variable ${cssVar}:`, error);
+                // 设置CSS变量失败，静默处理
             }
         });
     }
@@ -97,8 +99,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
 
     }
 
-    SetTreeData(json) {
+    SetDataSourceByObjTree(json) {
         this.TreeGridOptionsConfig.treeData = json;
+    }
+
+    SetDataSourceByIdPidTable(json) {
+        
     }
 
     GetTreeData() {

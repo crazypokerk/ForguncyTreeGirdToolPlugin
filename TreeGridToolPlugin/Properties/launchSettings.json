@@ -2,7 +2,7 @@
   "profiles": {
     "TreeGridToolPlugin": {
       "commandName": "Executable",
-      "executablePath": "E:\\ForguncyDesigner\\Forguncy 11\\Website\\designerBin\\Forguncy.exe"
+      "executablePath": "%FORGUNCY_PATH%\\Website\\designerBin\\Forguncy.exe"
     }
   }
 }

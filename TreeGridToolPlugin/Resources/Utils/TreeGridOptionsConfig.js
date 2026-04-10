@@ -1,4 +1,4 @@
-﻿class TreeGridOptionsConfig {
+class TreeGridOptionsConfig {
     _treeDom;
     _treeData = null;
     _columnsConfig;
@@ -45,24 +45,24 @@
         this._dragAndDrop = treeGridOptionsFirstNeededParams.dragAndDrop;
         this._selectMode =  this.SELECT_MODE[treeGridOptionsFirstNeededParams.selectMode];
         this._connectTopBreadcrumb = treeGridOptionsFirstNeededParams.connectTopBreadcrumb === false ? null : "output#parentPath";
-        for (let item of this._typesProperties) {
-            this._currentLevelRowBackgroundColorMap.set(item.Level, item.CurrentLevelRowBackgroundColor === undefined ? null : item.CurrentLevelRowBackgroundColor);
-        }
-        for (let item of this._typesProperties) {
-            this._types[item.Level] = {
-                icon: item.Name,
-                colspan: item.IsColspan === undefined ? false : item.IsColspan,
+        if (this._typesProperties && this._typesProperties.length) {
+            for (let item of this._typesProperties) {
+                this._currentLevelRowBackgroundColorMap.set(item.Level, item.CurrentLevelRowBackgroundColor === undefined ? null : item.CurrentLevelRowBackgroundColor);
+                this._types[item.Level] = {
+                    icon: item.Name,
+                    colspan: item.IsColspan === undefined ? false : item.IsColspan,
+                };
+                this._levelMap.set(item.Level, {
+                    icon: item.Name,
+                    colspan: item.IsColspan === undefined ? false : item.IsColspan,
+                    asyncLoadData: item.IsAsyncLoadData === undefined ? false : item.IsAsyncLoadData
+                });
             }
         }
-        for (let item of this._typesProperties) {
-            this._levelMap.set(item.Level, {
-                icon: item.Name,
-                colspan: item.IsColspan === undefined ? false : item.IsColspan,
-                asyncLoadData: item.IsAsyncLoadData === undefined ? false : item.IsAsyncLoadData
-            })
-        }
-        for (let item of this._columnsProperties) {
-            this._relations.set(item.Id, {cellType: item.CellType, jsonPropertyName: item.Id});
+        if (this._columnsProperties && this._columnsProperties.length) {
+            for (let item of this._columnsProperties) {
+                this._relations.set(item.Id, {cellType: item.CellType, jsonPropertyName: item.Id});
+            }
         }
 
         if (this._dragAndDrop) {
@@ -82,7 +82,6 @@
                     return ["before", "after"];
                 },
                 drop: (e) => {
-                    console.log("Drop " + e.sourceNode + " => " + e.region + " " + e.node);
                     e.sourceNode.moveTo(e.node, e.suggestedDropMode);
                 },
             }
@@ -174,10 +173,8 @@
                         // return e.node.type === "person";
                     },
                     edit: (e) => {
-                        console.log(e.type, e);
                     },
                     apply: function (e) {
-                        console.log(e.type, e);
                         // Simulate async storage that also validates:
                         return e.util.setTimeoutPromise(() => {
                             e.inputElem.setCustomValidity("");
@@ -200,7 +197,6 @@
                     // },
                 },
                 load: (e) => {
-                    console.warn('reload')
                 },
                 init: (e) => {
                     const tree = e.tree;
@@ -218,11 +214,9 @@
                     }
                 },
                 change: (e) => {
-                    console.warn(this._updateData)
                     const util = e.util;
                     const node = e.node;
                     const info = e.info;
-                    console.warn(info)
                     const colId = info.colId;
                     e.tree.logDebug(`change(${colId})`, util.getValueFromElem(e.inputElem, true));
 
@@ -243,7 +237,7 @@
                         let queryDataOption = {queryConditions};
                         const curData = await this.getBindingDataWithOptions(queryDataOption, 1);
                         // 这里要判断的原因是，有可能当前已经是叶子结点，没有子结点了，第一种情况是因为数据表加了查询条件
-                        if (curData.ID === undefined || curData.length === 0 || curData === []) {
+                        if (curData.ID === undefined || curData.length === 0) {
                             await e.node.setExpanded(true);
                             e.node.setStatus('noData')
                             e.node._isLoading = false;
@@ -359,6 +353,7 @@
         return new Promise((resolve, reject) => {
             if(this._bindingDataSourceModel === undefined || this._bindingDataSourceModel === null) {
                 resolve(emptyData);
+                return;
             }
             try {
                 this._treeGridToolPluginCellType.getBindingDataSourceValue(this._bindingDataSourceModel, queryDataOption, data => {
@@ -375,7 +370,6 @@
                     }
                 }, true);
             } catch (e) {
-                console.error(e);
                 reject(e);
             } finally {
                 if (this._treeData == null) {

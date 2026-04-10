@@ -9,7 +9,7 @@
 };
 
 function generateColumns(customColumns) {
-    if (!customColumns.length) return [];
+    if (!customColumns || !customColumns.length) return {cols: [], cellTypeMap: new Map(), cellIsEdit: new Map()};
 
     const cellTypeMap = new Map();
     const cellIsEdit = new Map();
@@ -28,33 +28,51 @@ function generateColumns(customColumns) {
 }
 
 function setColumnCellType(type) {
-    let innerHTML = '';
+    let element;
     switch (type) {
         case 0:
-            innerHTML = '<input type="text" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'text';
+            element.tabIndex = -1;
             break;
         case 1:
-            innerHTML = '<input type="number" step="any" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'number';
+            element.step = 'any';
+            element.tabIndex = -1;
             break;
         case 2:
-            innerHTML = '<input type="date" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'date';
+            element.tabIndex = -1;
             break;
         case 3:
-            innerHTML = '<input type="checkbox" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'checkbox';
+            element.tabIndex = -1;
             break;
         case 4:
-            innerHTML = `<select tabindex="-1">
-                                <option value="h">Happy</option>
-                                <option value="s">Sad</option>
-                             </select>`;
+            element = document.createElement('select');
+            element.tabIndex = -1;
+            const option1 = document.createElement('option');
+            option1.value = 'h';
+            option1.textContent = 'Happy';
+            const option2 = document.createElement('option');
+            option2.value = 's';
+            option2.textContent = 'Sad';
+            element.appendChild(option1);
+            element.appendChild(option2);
             break;
         case 5:
-            innerHTML = '<input type="time" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'time';
+            element.tabIndex = -1;
             break;
         default:
-            innerHTML = '<input type="text" tabindex="-1">';
+            element = document.createElement('input');
+            element.type = 'text';
+            element.tabIndex = -1;
             break;
     }
-
-    return innerHTML;
+    return element;
 }

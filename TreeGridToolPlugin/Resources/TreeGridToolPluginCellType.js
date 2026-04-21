@@ -42,27 +42,12 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
         this.TreeGridOptionsConfig.bindingDataSourceModel = this.CellElement.CellType.DataSource;
         this.TreeGridOptionsConfig.treeDom = document.getElementById("fgc-tree-table");
 
-        let queryConditions = [];
-        let relationType = 1;
-        this.TreeGridOptionsConfig.levelMap.forEach((value, key) => {
-            if (value.asyncLoadData) {
-                queryConditions.push({columnName: "Type", compareType: 0, compareValue: key})
-            }
-        })
-        let queryDataOption = {
-            queryConditions: queryConditions,
-            relationType
-        };
-        
-        // first loading
-        this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
+        this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.initializeTreeData();
         this.TreeGridOptionsConfig.buildTreeGridOptions();
 
-        // value changed loading
         if (this.TreeGridOptionsConfig.bindingDataSourceModel) {
             this.onBindingDataSourceDependenceCellValueChanged(this.TreeGridOptionsConfig.bindingDataSourceModel, async () => {
-                this.TreeGridOptionsConfig.treeData = await this.TreeGridOptionsConfig.getBindingDataWithOptions(queryDataOption, 0);
-                this.TreeGridOptionsConfig.reloadTreeData(this.TreeGridOptionsConfig.treeData);
+                await this.TreeGridOptionsConfig.refreshTreeData();
             });
         }
     }
@@ -100,26 +85,30 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     }
 
     SetDataSourceByObjTree(json) {
-        this.TreeGridOptionsConfig.treeData = json;
+        const treeData = this.#normalizeJsonValue(json);
+        this.TreeGridOptionsConfig.reloadTreeData(Array.isArray(treeData) ? treeData : []);
     }
 
     SetDataSourceByIdPidTable(json) {
-        
+        const rows = this.#normalizeJsonValue(json);
+        const treeData = this.TreeGridOptionsConfig.prepareTreeData(Array.isArray(rows) ? rows : []);
+        this.TreeGridOptionsConfig.reloadTreeData(treeData);
     }
 
     GetTreeData() {
-        if (this.TreeGridOptionsConfig.treeData === null) return;
-        this.TreeGridOptionsConfig.treeData.toDictArray();
+        return {
+            TreeDataJson: JSON.stringify(this.TreeGridOptionsConfig.getTreeDataSnapshot())
+        };
     }
 
     GetUpdateData() {
-        const obj = {};
-        for (const [key, value] of this.TreeGridOptionsConfig.updateData.entries()) {
-            if (typeof key === 'string' || typeof key === 'number') {
-                obj[key] = value;
-            }
-        }
-        return {UpdateDataJson: JSON.stringify(obj)}
+        return {
+            UpdateDataJson: JSON.stringify(this.TreeGridOptionsConfig.getUpdateDataSnapshot())
+        };
+    }
+
+    ClearUpdateData() {
+        this.TreeGridOptionsConfig.clearUpdateData();
     }
 
     ToggleExpandAll() {
@@ -141,17 +130,20 @@ class TreeGridToolPluginCellType extends Forguncy.Plugin.CellTypeBase {
     }
 
     GetSelectedData() {
-        let selectedNodes = this.TreeGridOptionsConfig.ForguncyTree.getSelectedNodes();
-        let selectedData = [];
-        selectedNodes.forEach((node) => {
-            if (node.children !== null) {
-                node.children.forEach((child) => {
-                    selectedData.push(child.data);
-                })
+        return {
+            SelectedDataJson: JSON.stringify(this.TreeGridOptionsConfig.getSelectedDataSnapshot())
+        };
+    }
+
+    #normalizeJsonValue(value) {
+        if (typeof value === "string") {
+            try {
+                return JSON.parse(value);
+            } catch (error) {
+                return [];
             }
-            selectedData.push(node.data);
-        })
-        return {SelectedDataJson: JSON.stringify(selectedData)};
+        }
+        return value;
     }
 }
 

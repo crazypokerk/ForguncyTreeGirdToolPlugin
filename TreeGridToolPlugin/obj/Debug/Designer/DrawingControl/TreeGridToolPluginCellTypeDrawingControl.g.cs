@@ -52,8 +52,8 @@ namespace TreeGridToolPlugin.Designer.DrawingControl {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/TreeGridToolPlugin;V1.0.0.0;component/designer/drawingcontrol/treegridtoolplugin" +
-                    "celltypedrawingcontrol.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/TreeGridToolPlugin;component/designer/drawingcontrol/treegridtoolplugincelltyped" +
+                    "rawingcontrol.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Designer\DrawingControl\TreeGridToolPluginCellTypeDrawingControl.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

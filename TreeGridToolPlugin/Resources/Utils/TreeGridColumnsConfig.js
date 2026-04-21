@@ -9,22 +9,37 @@
 };
 
 function generateColumns(customColumns) {
-    if (!customColumns || !customColumns.length) return {cols: [], cellTypeMap: new Map(), cellIsEdit: new Map()};
+    if (!customColumns || !customColumns.length) {
+        return {
+            cols: [],
+            cellTypeMap: new Map(),
+            cellIsEdit: new Map(),
+            columnFieldMap: new Map(),
+            titleFieldName: "Title"
+        };
+    }
 
     const cellTypeMap = new Map();
     const cellIsEdit = new Map();
+    const columnFieldMap = new Map();
     const cols = [];
+    let titleFieldName = "Title";
     customColumns.forEach((item) => {
+        const columnId = item.Id.toLowerCase() === "title" ? '*' : item.Id;
         cols.push({
             title: item.Name,
-            id: item.Id.toLowerCase() === "title" ? '*' : item.Id,
+            id: columnId,
             width: item.Width == null ? "*" : `${item.Width}px`,
             classes: columnsStyleType[item.ColumnStyle]
         });
-        cellTypeMap.set(item.Id, item.CellType);
-        cellIsEdit.set(item.Id, item.Editable);
+        cellTypeMap.set(columnId, item.CellType);
+        cellIsEdit.set(columnId, item.Editable);
+        columnFieldMap.set(columnId, item.Id);
+        if (columnId === '*') {
+            titleFieldName = item.Id;
+        }
     })
-    return {cols, cellTypeMap, cellIsEdit};
+    return {cols, cellTypeMap, cellIsEdit, columnFieldMap, titleFieldName};
 }
 
 function setColumnCellType(type) {

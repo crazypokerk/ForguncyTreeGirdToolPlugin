@@ -16,58 +16,58 @@ namespace TreeGridToolPlugin
             AllowAddCustomColumns = true,
             Columns = "ID|PID|Type|Title",
             ColumnsDescription = "ID:ID列|PID:父级ID列|Type:层级列|Title:标题列",
-            IsIdPidStructure = true, 
-            TreeIdColumnName = "ID", 
+            IsIdPidStructure = true,
+            TreeIdColumnName = "ID",
             TreePidColumnName = "PID"
             )]
         [DisplayName("绑定数据源")]
         public object DataSource { get; set; }
-        
+
         [DisplayName("列名配置")]
         [Description("注意，列名配置的列名属性值必须与绑定数据源的列名一致，否则会导致数据显示异常")]
         [ObjectListProperty(ItemType = typeof(ColumnObject))]
         public List<INamedObject> ColumnsProperties { get; set; }
-        
+
         [DisplayName("层级配置")]
         [Description("此配置用于配置树型表每一层级的配置，所以需要有一列数据表示当前行的层级；注意，图标配置的层级属性值必须与绑定数据源的层级一致，否则会导致数据显示异常")]
         [ObjectListProperty(ItemType = typeof(TypeObject))]
         public List<INamedObject> TypesProperties { get; set; }
-        
+
         [DisplayName("是否开启选择行")]
         public bool IsCheckbox { get; set; }
-        
+
         [DisplayName("多选时策略")]
         [Description("多选时策略，默认为单行多选，即每次只能选择一行数据，如需多选下级数据，请选择下级多选")]
         public MultipleType MultipleProperty { get; set; }
-        
+
         [DisplayName("开启面包屑导航")]
         public bool ConnectTopBreadcrumb { get; set; }
-        
+
         [DisplayName("开启行拖拽")]
         public bool IsDragAndDrop { get; set; }
 
         #region Style configuriton
-        
+
         [DisplayName("表格字体")]
         [FontFamilyProperty]
         public string FontFamily { get; set; }
-        
+
         [DisplayName("表格背景颜色")]
         [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
         public string TreeTableBackgroundColor { get; set; }
-        
+
         [DisplayName("表格字体颜色")]
         [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
         public string TreeTableFontColor { get; set; }
-        
+
         [DisplayName("表格边框颜色")]
         [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
         public string TreeTableBorderColor { get; set; }
 
         #endregion
-        
+
         #region Run Time Method
-        
+
         // [DisplayName("设置数据源(对象树)")]
         // [RunTimeMethod]
         // public void SetDataSourceByObjTree(
@@ -114,24 +114,25 @@ namespace TreeGridToolPlugin
         //     string parentValue = "parentValue")
         // {
         // }
-        
+
         [DisplayName("获取数据")]
         [RunTimeMethod]
-        public void GetTreeData()
+        public GetTreeDataJson GetTreeData()
         {
             // 调用JavaScript端GetTreeData方法获取树数据
             // 注意：实际执行将由活字格框架自动转发到JavaScript端
+            return new GetTreeDataJson { TreeDataJson = "[]" };
         }
-        
+
         [DisplayName("获取更新数据")]
         [RunTimeMethod]
         public GetUpdateDataJson GetUpdateData()
         {
             // 调用JavaScript端GetUpdateData方法获取更新数据
             // 注意：实际执行将由活字格框架自动转发到JavaScript端
-            return new GetUpdateDataJson { UpdateDataJson = "{}" };
+            return new GetUpdateDataJson { UpdateDataJson = "[]" };
         }
-        
+
         [DisplayName("展开/收起所有节点")]
         [RunTimeMethod]
         public void ToggleExpandAll()
@@ -139,7 +140,7 @@ namespace TreeGridToolPlugin
             // 调用JavaScript端ToggleExpandAll方法切换节点展开状态
             // 注意：实际执行将由活字格框架自动转发到JavaScript端
         }
-        
+
         [DisplayName("全选/取消全选")]
         [RunTimeMethod]
         public void ToggleSelectAll()
@@ -168,7 +169,8 @@ namespace TreeGridToolPlugin
             // 注意：实际执行将由活字格框架自动转发到JavaScript端
             return new GetSelectedDataJson { SelectedDataJson = "[]" };
         }
-        
+
+
         #endregion
 
         public override bool GetDesignerPropertyVisible(string propertyName)
@@ -190,26 +192,31 @@ namespace TreeGridToolPlugin
     {
         public string UpdateDataJson { get; set; }
     }
-    
+
+    public class GetTreeDataJson
+    {
+        public string TreeDataJson { get; set; }
+    }
+
     public class GetSelectedDataJson
     {
         public string SelectedDataJson { get; set; }
     }
-    
+
     public class ColumnObject : ObjectPropertyBase, INamedObject
     {
         [DisplayName("列名")]
         public string Name { get; set; }
-        
+
         [DisplayName("Json属性名")]
         public string Id { get; set; }
-        
+
         [DisplayName("列宽")]
         public string Width { get; set; }
-        
+
         [DisplayName("列样式")]
         public ColumnClass ColumnStyle { get; set; }
-        
+
         [DisplayName("单元格类型")]
         public CellTypeEnum CellType { get; set; }
 
@@ -223,24 +230,24 @@ namespace TreeGridToolPlugin
         [DisplayName("图标类名")]
         [Description("图标类名需要在Bootstrap Icon中查找，例如：bi bi-person")]
         public string Name { get; set; }
-        
+
         [DisplayName("层级")]
         [Description("层级从1开始，层级为1的图标会显示第一层级的行，层级为2的图标会显示在第二层级的行，以此类推")]
         public string Level { get; set; }
-        
+
         [DisplayName("是否首行单元格合并为一行")]
         [Description("如果当前行只需要展示第一行数据，可以合并当前行的列，默认值为false")]
         public bool IsColspan { get; set; }
-        
+
         [DisplayName("异步加载数据")]
         [Description("如果当前层级的数据需要异步加载，可以勾选此选项；并且下级勾选了该选项后，上级也都必须勾选！但需注意，当前层级节点在第一次加载时不能有子节点，否则不会触发异步加载数据")]
         public bool IsAsyncLoadData { get; set; }
-        
+
         [DisplayName("当前层级行背景颜色")]
         [ColorProperty(SupportNoFill = true, SupportTranslucency = true)]
         public string CurrentLevelRowBackgroundColor { get; set; }
     }
-    
+
     public enum CellTypeEnum
     {
         [Description("文本")]
@@ -256,7 +263,7 @@ namespace TreeGridToolPlugin
         [Description("时间")]
         Link = 5
     }
-    
+
     public enum MultipleType
     {
         [Description("单行多选")]
@@ -282,8 +289,8 @@ namespace TreeGridToolPlugin
         [Description("列渲染为链接样式")]
         WbHelperLink = 6
     }
-    
 
-    
+
+
 
 }
